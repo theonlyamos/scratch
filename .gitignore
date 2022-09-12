@@ -1,0 +1,6 @@
+.vscode
+/__pycache__
+scratch.db.bak
+scratch.db.dat
+scratch.db.dir
+scratch.nt
