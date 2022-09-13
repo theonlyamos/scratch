@@ -52,7 +52,7 @@ class CheckItem(Frame):
         self.entry.bind('<FocusOut>', self.focus_out)
         self.entry.bind('<Return>', self.focus_out)
         self.entry.focus()
-        self.entry.pack(side=LEFT, fill=X, expand=True, ipady=5)
+        self.entry.pack(side=LEFT, fill=BOTH, expand=True, ipady=5)
 
         close_btn = Label(
             self, 
@@ -67,24 +67,23 @@ class CheckItem(Frame):
         close_btn.bind('<ButtonPress-1>', self.delete)
         close_btn.pack(side=RIGHT, ipadx=5)
 
-        self.pack(side=TOP, fill=X, pady=5)
+        self.pack(side=TOP, fill=BOTH, expand=True, pady=5)
     
     def check(self):
         '''
         Invoked on checkbutton checked
         '''
-        if self.checked:
-            self.checked = False
+        if not self.check_var.get():
             self.entry.configure(state='normal')
             self.entry.configure(fg='white')
             self.pack_forget()
             self.pack(side=TOP, fill=X, pady=5)
         else:
-            self.checked = True
             self.entry.configure(state='disabled')
             self.entry.configure(fg='#161a1d')
             self.pack_forget()
-            self.pack(side=BOTTOM, fill=X, pady=5)
+            if self.master.show_checked_var.get():
+                self.pack(side=BOTTOM, fill=X, pady=5)
         
         self.master.master.save()
     

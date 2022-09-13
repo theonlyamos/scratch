@@ -28,7 +28,7 @@ class ToolBar(Frame):
             add_btn.bind('<Enter>', self.hover)
             add_btn.bind('<Leave>', self.leave)
             add_btn.bind('<ButtonPress-1>', self.add_btn_command)
-            add_btn.pack(side=LEFT, ipadx=10)
+            add_btn.pack(side=LEFT, ipadx=5)
 
         if self.show_close_btn:
             close_btn = Label(
@@ -42,7 +42,7 @@ class ToolBar(Frame):
             close_btn.bind('<Enter>', self.hover)
             close_btn.bind('<Leave>', self.leave)
             close_btn.bind('<ButtonPress-1>', self.close_app)
-            close_btn.pack(side=RIGHT, ipadx=10)
+            close_btn.pack(side=RIGHT, ipadx=5)
     
     def hover(self, event=None):
         '''

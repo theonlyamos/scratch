@@ -77,11 +77,45 @@ class CheckList(Toplevel):
         self.title_entry.bind('<FocusOut>', self.focus_out)
         self.title_entry.bind('<Return>', self.focus_out)
         self.title_entry.pack(side=LEFT, fill=X, ipady=5)
+
+        self.show_checked_var = BooleanVar(value=False)
+        Checkbutton(
+            tools_frame,
+            variable=self.show_checked_var,
+            onvalue=1,
+            offvalue=0,
+            command=self.toggle_checked,
+            bg='black'
+        ).pack(side=RIGHT)
         
         tools_frame.pack(side=TOP, fill=X)
 
         for item in self.items:
-            CheckItem(self, **item)
+            if not item['checked']:
+                CheckItem(self, **item)
+                
+        for item in self.items:
+            if item['checked']:
+                CheckItem(self, **item)
+        
+        self.toggle_checked()
+
+    
+    def toggle_checked(self):
+        '''
+        Toggle checked items
+        '''
+        if self.show_checked_var.get():
+            for item in self.children.values():
+                if '!checkitem' in item.__str__():
+                    if item.check_var.get():
+                        item.pack(side=BOTTOM, fill=X, pady=5)
+        else:
+            for item in self.children.values():
+                if '!checkitem' in item.__str__():
+                    if item.check_var.get():
+                        item.pack_forget()
+                    
     
     def add_item(self, event=None):
         '''
