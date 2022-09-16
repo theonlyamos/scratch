@@ -82,7 +82,7 @@ class AddMenu(Toplevel):
             bg=self.bg,
             fg=self.fg,
             font=('Consolas', 10, 'normal'),
-            command=lambda: self.set_selected(item='event')
+            command=lambda: self.set_selected(item='reminder')
         )
 
         new_reminder_btn.bind('<Enter>', self.hover)

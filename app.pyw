@@ -8,6 +8,7 @@ from toolbar import ToolBar
 from note import Note
 from checklist import CheckList
 from addmenu import AddMenu
+from reminder import Reminder
     
 import shelve
 
@@ -60,6 +61,8 @@ class Scratch(Tk):
                 CheckList(self, **item)
             elif item_type == 'note':
                 Note(self, **item)
+            elif item_type == 'reminder':
+                Reminder(self, **item)
             else:
                 print('Not a valid type')
 
@@ -67,7 +70,7 @@ class Scratch(Tk):
     
     def get_posY(self)->int:
         '''
-        Calculate next item positioning
+        Calculate next item veritcal positioning
         '''
         posY = 0
         for item in self.children.values():
@@ -108,6 +111,17 @@ class Scratch(Tk):
             self.save()
             new_checklist = checklist_window.show()
             # save_note(new_checklist.strip())
+        elif item == 'reminder':
+            posY = self.get_posY()
+            
+            reminder_window = Reminder(
+                self,
+                width=Scratch.WIDTH,
+                posX=self.posX,
+                posY=posY
+            )
+            self.save()
+            new_reminder = reminder_window.show()
     
     def toggle_add_menu(self, event=None):
         '''
