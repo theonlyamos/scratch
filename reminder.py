@@ -1,3 +1,5 @@
+from threading import Thread
+from time import sleep
 from tkinter import *
 from tkinter.ttk import Combobox
 
@@ -59,6 +61,11 @@ class Reminder(Toplevel):
             self,
             bg='black',
         )
+        
+        info_frame = Frame(
+            self,
+            bg='black',
+        )
 
         self.title_var = StringVar(value=self.title)
         self.title_entry = Entry(
@@ -93,7 +100,7 @@ class Reminder(Toplevel):
         tools_frame.pack(side=TOP, fill=X)
         
         self.date_label = Label(
-            self,
+            info_frame,
             text=self.date_time.strftime("%a %b %d %Y"),
             font='Consolas 12 bold',
             bg='black',
@@ -101,7 +108,18 @@ class Reminder(Toplevel):
             justify='left',
         )
         
-        self.date_label.pack(side=TOP, fill=X, expand=True, pady=5, ipadx=5)
+        self.days_left_label = Label(
+            info_frame,
+            text=self.get_days_left(),
+            font='Consolas 12 bold',
+            bg='black',
+            fg='lime',
+            justify='right',
+        )
+        
+        self.date_label.pack(side=LEFT, fill=X, expand=True, ipadx=5)
+        self.days_left_label.pack(side=RIGHT, fill=X, expand=True, ipadx=5)
+        info_frame.pack(side=TOP, fill=X, expand=True, pady=5)
         
         date_frame = LabelFrame(
             self,
@@ -161,6 +179,33 @@ class Reminder(Toplevel):
         daybox.pack(side=LEFT, pady=2, padx=2)
         
         date_frame.pack(side=TOP, ipadx=3, fill=X)
+        
+        check_thread = Thread(target=self.check_days_left)
+        check_thread.daemon = True
+        self.after(100, lambda: check_thread.start())
+    
+    def get_days_left(self)->str:
+        '''
+        Calculate days difference
+        '''
+        
+        return f"{(self.date_time - datetime.utcnow()).days} days"
+
+    def check_days_left(self):
+        '''
+        Toggle days left color
+        '''
+        while True:
+            difference =  (self.date_time - datetime.utcnow()).days
+            
+            if not difference:
+                self.days_left_label.configure(fg='red')
+            else:
+                self.days_left_label.configure(fg='lime')
+            self.update_idletasks()
+            
+            sleep(60)
+            
     
     def set_datetime(self, event=None):
         '''
@@ -168,6 +213,7 @@ class Reminder(Toplevel):
         '''
         self.date_time = datetime(self.year_var.get(), Reminder.MONTHS.index(self.mon_var.get())+1, self.day_var.get())
         self.date_label.configure(text=self.date_time.strftime("%a %b %d %Y"))
+        self.check_days_left()
 
     def focus_in(self, event=None):
         event.widget.configure(state='normal')
