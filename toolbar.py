@@ -43,6 +43,8 @@ class ToolBar(Frame):
             close_btn.bind('<Leave>', self.leave)
             close_btn.bind('<ButtonPress-1>', self.close_app)
             close_btn.pack(side=RIGHT, ipadx=5)
+        
+        self.bind('<B1-Motion>', lambda e: self.onMotion(e))
     
     def hover(self, event=None):
         '''
@@ -59,12 +61,26 @@ class ToolBar(Frame):
         '''
         event.widget.configure(bg='black')
     
+    def onMotion(self, event):
+        if self.master.__str__() != '.':
+            deltax = event.x
+            deltay = event.y
+            x = self.master.winfo_x()+deltax
+            y = self.master.winfo_y()+deltay
+            self.master.geometry("+%s+%s" %(x, y))
+    
     def close_app(self, event=None):
         '''
         Close the program
         '''
-        if self.master.__str__() == '.':
-            self.master.save()
+        toplevel = self.master if self.master.__str__() == '.' else self.master.master
+        toplevel.save()
+        
+        if toplevel.__str__() != self.master.__str__():
+            self.master.destroy()
+            toplevel.save()
+            toplevel.reload()
         else:
-            self.master.master.save()
-        self.master.destroy()
+            toplevel.destroy()
+        
+        

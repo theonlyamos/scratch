@@ -52,10 +52,17 @@ class Scratch(Tk):
         self.add_menu_window = None
 
         items = self.load()
-
+        new_pos = 0
+        
         for index, item in enumerate(items):
             item_type = item['type']
             del item['type']
+            
+
+            # if not index:
+            #     item['posY'] = 50
+                
+            # item['posX'] = self.posX
 
             if item_type == 'checklist':
                 CheckList(self, **item)
@@ -77,6 +84,7 @@ class Scratch(Tk):
             posY += item.winfo_height()
         
         posY += len(self.children.values())*10
+        
         return posY
 
     def new_item(self, event=None, item='note'):
@@ -161,11 +169,7 @@ class Scratch(Tk):
         '''
         items = []
         for item in self.children.keys():
-            if  '!toolbar' in item:
-                pass 
-            elif '!addmenu' in item:
-                pass
-            else:
+            if not '!toolbar' in item and not '!addmenu' in item:
                 items.append(self.children[item].to_object())
 
         db = shelve.open('scratch.db')
@@ -182,6 +186,19 @@ class Scratch(Tk):
             items = db['items']
         db.close()
         return items
+    
+    def reload(self):
+        '''
+        Rearrange items on item deletion
+        '''
+        pass
+        # items = self.children.copy()
+        
+        # for item in items.keys():
+        #     if self.children[item]:
+        #         self.children[item].destroy()
+        
+        # self.content()
 
 
 if __name__ == '__main__':

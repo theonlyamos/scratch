@@ -38,8 +38,8 @@ class CheckList(Toplevel):
                 
         return {
             'type': 'checklist',
-            'posX': self.posX,
-            'posY': self.posY,
+            'posX': self.winfo_x(),
+            'posY': self.winfo_y(),
             'width': self.winfo_width(),
             'height': self.winfo_height(),
             'title': self.title_var.get(),
@@ -76,7 +76,7 @@ class CheckList(Toplevel):
         self.title_entry.bind('<Double-1>', self.focus_in)
         self.title_entry.bind('<FocusOut>', self.focus_out)
         self.title_entry.bind('<Return>', self.focus_out)
-        self.title_entry.pack(side=LEFT, fill=X, ipady=5)
+        self.title_entry.pack(side=LEFT, fill=X, expand=True, ipady=5)
 
         self.show_checked_var = BooleanVar(value=False)
         Checkbutton(
@@ -124,7 +124,9 @@ class CheckList(Toplevel):
         item = {'label': '', 'checked': False}
         self.items.append(item)
         CheckItem(self, **item)
+        
         self.master.save()
+        self.master.reload()
     
     def focus_in(self, event=None):
         event.widget.configure(state='normal')

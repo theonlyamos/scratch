@@ -12,7 +12,7 @@ class Reminder(Toplevel):
     MONTHS = ('January', 'February', 'March', 'April', 'May', 'June',
               'July', 'August', 'September', 'October', 'November', 'December')
 
-    def __init__(self, master=None, posX=0, posY=0, title='Title Here', date_time=datetime.utcnow(), width=250, height=100, bg='#161a1d', fg='#fdfffc', **kw):
+    def __init__(self, master=None, posX=0, posY=0, title='Title Here', date_time=datetime.utcnow(), width=250, height=120, bg='#161a1d', fg='#fdfffc', **kw):
         super().__init__(master, **kw)
         self.date_time = date_time
         self.year = date_time.year
@@ -41,8 +41,8 @@ class Reminder(Toplevel):
          
         return {
             'type': 'reminder',
-            'posX': self.posX,
-            'posY': self.posY,
+            'posX': self.winfo_x(),
+            'posY': self.winfo_y(),
             'width': self.winfo_width(),
             'height': self.winfo_height(),
             'title': self.title_var.get(),
@@ -88,13 +88,24 @@ class Reminder(Toplevel):
         self.title_entry.bind('<Double-1>', self.focus_in)
         self.title_entry.bind('<FocusOut>', self.focus_out)
         self.title_entry.bind('<Return>', self.focus_out)
-        self.title_entry.pack(side=LEFT, fill=X, padx=5, ipady=5)
+        self.title_entry.pack(side=LEFT, fill=X, expand=True, padx=5, ipady=5)
         
         tools_frame.pack(side=TOP, fill=X)
         
+        self.date_label = Label(
+            self,
+            text=self.date_time.strftime("%a %b %d %Y"),
+            font='Consolas 12 bold',
+            bg='black',
+            fg='white',
+            justify='left',
+        )
+        
+        self.date_label.pack(side=TOP, fill=X, expand=True, pady=5, ipadx=5)
+        
         date_frame = LabelFrame(
             self,
-            text='Date',
+            text='Set Date',
             bg=self.bg,
             fg=self.fg
         )
@@ -149,13 +160,14 @@ class Reminder(Toplevel):
         monthbox.pack(side=LEFT, pady=2, padx=2)
         daybox.pack(side=LEFT, pady=2, padx=2)
         
-        date_frame.pack(side=TOP, pady=5, ipady=3, ipadx=3, fill=X)
+        date_frame.pack(side=TOP, ipadx=3, fill=X)
     
     def set_datetime(self, event=None):
         '''
         Set date_time from combobox
         '''
         self.date_time = datetime(self.year_var.get(), Reminder.MONTHS.index(self.mon_var.get())+1, self.day_var.get())
+        self.date_label.configure(text=self.date_time.strftime("%a %b %d %Y"))
 
     def focus_in(self, event=None):
         event.widget.configure(state='normal')

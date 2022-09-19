@@ -32,8 +32,8 @@ class Note(Toplevel):
         '''
         return {
             'type': 'note',
-            'posX': self.posX,
-            'posY': self.posY,
+            'posX': self.winfo_x(),
+            'posY': self.winfo_y(),
             'width': self.winfo_width(),
             'height': self.winfo_height(),
             'bg': self.bg,

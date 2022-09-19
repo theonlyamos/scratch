@@ -109,5 +109,7 @@ class CheckItem(Frame):
         '''
         Remove item from checklist
         '''
-        self.master.master.save()
         self.destroy()
+        self.master.master.save()
+        self.master.master.reload()
+        
