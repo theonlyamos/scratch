@@ -68,6 +68,7 @@ class ToolBar(Frame):
             x = self.master.winfo_x()+deltax
             y = self.master.winfo_y()+deltay
             self.master.geometry("+%s+%s" %(x, y))
+            self.master.master.save()
     
     def close_app(self, event=None):
         '''

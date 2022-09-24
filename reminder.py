@@ -75,7 +75,7 @@ class Reminder(Toplevel):
             bg='black',
             fg='white',
             state='disabled',
-            disabledforeground='white',
+            disabledforeground='gold',
             disabledbackground='black',
             border=0
         )
@@ -196,8 +196,9 @@ class Reminder(Toplevel):
         Toggle days left color
         '''
         while True:
-            difference =  (self.date_time - datetime.utcnow()).days
+            self.days_left_label.configure(text=self.get_days_left())
             
+            difference =  (self.date_time - datetime.utcnow()).days
             if not difference:
                 self.days_left_label.configure(fg='red')
             else:
