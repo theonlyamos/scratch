@@ -3,6 +3,7 @@ __version__ = '0.01'
 
 from tkinter import *
 from tkinter import ttk
+from PIL import Image, ImageTk
 
 from toolbar import ToolBar
 from note import Note
@@ -46,8 +47,23 @@ class Scratch(Tk):
             add_btn=True,
             add_btn_command=self.toggle_add_menu
         )
+        
+        
 
         self.top_frame.pack(side=TOP, fill=X)
+        
+        # settings_icon = Image.open('images/gear.png').convert('RGBA')
+        # #settings_icon = ImageOps.invert(settings_icon)
+        # settings_icon = ImageTk.PhotoImage(settings_icon.resize((20,20)))
+        
+        # settings_btn = Button(
+        #     self.top_frame,
+        #     image=settings_icon,
+        #     text='',
+        #     compound='left'
+        # )
+
+        # #settings_btn.pack(side=RIGHT, ipadx=5)
 
         self.add_menu_window = None
 
@@ -79,28 +95,43 @@ class Scratch(Tk):
         '''
         Calculate next item veritcal positioning
         '''
-        posY = 0
-        for item in self.children.values():
-            posY += item.winfo_height()
+        last_item = self.children[list(self.children.keys())[-1]]
+        screen_y = last_item.winfo_height() + last_item.winfo_y()
+
+        if (self.winfo_screenheight() - screen_y) > 200:
+            return screen_y + 10
+        return 48
+
+        screen_width = self.winfo_screenwidth()
+        width = screen_width - ((last_item['width'] + last_item['posX']).WIDTH*2)
         
-        posY += len(self.children.values())*10
+    def get_posX(self)->int:
+        '''
+        Calculate next item veritcal positioning
+        '''
+        last_item = self.children[list(self.children.keys())[-1]]
+        screen_y = last_item.winfo_height() + last_item.winfo_y()
+        if last_item.winfo_x() == 0:
+            return self.posX
+        if (self.winfo_screenheight() - screen_y) > 200 and last_item.winfo_x() >= self.posX:
+            return self.posX
+
+        return (self.winfo_screenwidth() - (last_item.winfo_width()*2))-10
         
-        return posY
 
     def new_item(self, event=None, item='note'):
         '''
         Open Toplevel window for creating \n
         new item
         '''
-        # toggle_add_menu()
+        posY = self.get_posY()
+        posX = self.get_posX()
         
         if item == 'note':
-            posY = self.get_posY()
-
             new_note_window = Note(
                 self,
                 width=Scratch.WIDTH,
-                posX=self.posX,
+                posX=posX,
                 posY=posY
             )
             self.save()
@@ -108,24 +139,21 @@ class Scratch(Tk):
             # save_note(new_entry.strip())
         
         elif item == 'checklist':
-            posY = self.get_posY()
-            
             checklist_window = CheckList(
                 self,
                 width=Scratch.WIDTH,
-                posX=self.posX,
+                posX=posX,
                 posY=posY
             )
             self.save()
             new_checklist = checklist_window.show()
             # save_note(new_checklist.strip())
-        elif item == 'reminder':
-            posY = self.get_posY()
             
+        elif item == 'reminder':
             reminder_window = Reminder(
                 self,
                 width=Scratch.WIDTH,
-                posX=self.posX,
+                posX=posX,
                 posY=posY
             )
             self.save()

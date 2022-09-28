@@ -17,7 +17,7 @@ class AddMenu(Toplevel):
 
         height = master.winfo_height()
         screen_width = master.winfo_screenwidth()
-        width = screen_width - (self.width*2)
+        width = (screen_width - (self.width*2))-10
         
         self.geometry(f"+%d+0" % width)
         self.minsize(width=self.width, height=40)
@@ -63,18 +63,18 @@ class AddMenu(Toplevel):
         new_checklist_btn.bind('<Leave>', self.leave)
         new_checklist_btn.pack(side=LEFT, ipady=5, fill=X, expand=True)
 
-        new_event_btn = Button(
-            add_menu_frame,
-            text='Event',
-            bg=self.bg,
-            fg=self.fg,
-            font=('Consolas', 10, 'normal'),
-            command=lambda: self.set_selected(item='event')
-        )
+        # new_event_btn = Button(
+        #     add_menu_frame,
+        #     text='Event',
+        #     bg=self.bg,
+        #     fg=self.fg,
+        #     font=('Consolas', 10, 'normal'),
+        #     command=lambda: self.set_selected(item='event')
+        # )
 
-        new_event_btn.bind('<Enter>', self.hover)
-        new_event_btn.bind('<Leave>', self.leave)
-        new_event_btn.pack(side=LEFT, ipady=5, fill=X, expand=True) 
+        # new_event_btn.bind('<Enter>', self.hover)
+        # new_event_btn.bind('<Leave>', self.leave)
+        # new_event_btn.pack(side=LEFT, ipady=5, fill=X, expand=True) 
 
         new_reminder_btn = Button(
             add_menu_frame,

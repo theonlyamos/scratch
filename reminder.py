@@ -195,17 +195,20 @@ class Reminder(Toplevel):
         '''
         Toggle days left color
         '''
-        while True:
-            self.days_left_label.configure(text=self.get_days_left())
-            
-            difference =  (self.date_time - datetime.utcnow()).days
-            if not difference:
-                self.days_left_label.configure(fg='red')
-            else:
-                self.days_left_label.configure(fg='lime')
-            self.update_idletasks()
-            
-            sleep(60)
+        try:
+            while True:
+                self.days_left_label.configure(text=self.get_days_left())
+                
+                difference =  (self.date_time - datetime.utcnow()).days
+                if not difference:
+                    self.days_left_label.configure(fg='red')
+                else:
+                    self.days_left_label.configure(fg='lime')
+                self.update_idletasks()
+                
+                sleep(60)
+        except:
+            pass
             
     
     def set_datetime(self, event=None):
@@ -214,7 +217,7 @@ class Reminder(Toplevel):
         '''
         self.date_time = datetime(self.year_var.get(), Reminder.MONTHS.index(self.mon_var.get())+1, self.day_var.get())
         self.date_label.configure(text=self.date_time.strftime("%a %b %d %Y"))
-        self.check_days_left()
+        self.days_left_label.configure(text=self.get_days_left())
 
     def focus_in(self, event=None):
         event.widget.configure(state='normal')
