@@ -66,6 +66,34 @@ class CheckItem(Frame):
         close_btn.bind('<Leave>', self.leave)
         close_btn.bind('<ButtonPress-1>', self.delete)
         close_btn.pack(side=RIGHT, ipadx=5)
+        
+        sublist_icon = self.master.master.icons['check-double']
+        sublist_btn = Label(
+            self, 
+            image=sublist_icon,
+            compound='left',
+            name='sublist',
+            bg='white'
+        )
+
+        sublist_btn.bind('<Enter>', self.hover)
+        sublist_btn.bind('<Leave>', self.leave)
+        sublist_btn.bind('<ButtonPress-1>', self.sublist)
+        sublist_btn.pack(side=RIGHT, padx=2, ipadx=2)
+        
+        # delete_icon = self.master.master.icons['trash']
+        # delete_btn = Label(
+        #     self, 
+        #     image=delete_icon,
+        #     compound='left',
+        #     name='delete',
+        #     bg='white'
+        # )
+
+        # delete_btn.bind('<Enter>', self.hover)
+        # delete_btn.bind('<Leave>', self.leave)
+        # delete_btn.bind('<ButtonPress-1>', self.delete)
+        # delete_btn.pack(side=RIGHT, padx=5, ipadx=2, ipady=2)
 
         self.pack(side=TOP, fill=BOTH, expand=True, pady=5)
     
@@ -94,13 +122,13 @@ class CheckItem(Frame):
         if event.widget.cget('text') == '+':
             event.widget.configure(bg='turquoise')
         else:
-            event.widget.configure(bg='brown')
+            event.widget.configure(fg='red')
 
     def leave(self, event=None):
         '''
         Revert foreground color to default
         '''
-        event.widget.configure(bg='black')
+        event.widget.configure(fg='white')
     
     def focus_out(self, event=None):
         self.master.master.save()
@@ -112,4 +140,10 @@ class CheckItem(Frame):
         self.destroy()
         self.master.master.save()
         self.master.master.reload()
+    
+    def sublist(self, event=None):
+        '''
+        Create sublist
+        '''
+        title = self.label_var.get()
         

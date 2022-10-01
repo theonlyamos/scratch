@@ -18,6 +18,7 @@ for fd in os.listdir(folder):
 BarsIcon = icons['bars']
 PlusIcon = icons['plus']
 CheckIcon = icons['check']
+CheckDoubleIcon = icons['check-double']
 XMarkIcon = icons['xmark']
 CalendarCheckIcon = icons['calendar-check']
 CalendarDaysIcon = icons['calendar-days']

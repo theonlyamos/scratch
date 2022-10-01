@@ -17,7 +17,8 @@ from icons import BarsIcon, GearIcon, CalendarPlusIcon,\
                     CalendarCheckIcon, CalendarDaysIcon, \
                     PlusIcon, SquareIcon, SquareCheckIcon, \
                     SquarePlusIcon, TrashCanIcon, CheckIcon, \
-                    XMarkIcon, SquareXMarkIcon, NoteStickyIcon
+                    XMarkIcon, SquareXMarkIcon, NoteStickyIcon, \
+                    CheckDoubleIcon
 
 
 class Scratch(Tk):
@@ -54,6 +55,7 @@ class Scratch(Tk):
             'close'     : ImageTk.PhotoImage(XMarkIcon.resize((8, 12))),
             'plus'      : ImageTk.PhotoImage(PlusIcon.resize((12, 12))),
             'check'      : ImageTk.PhotoImage(CheckIcon.resize((12, 12))),
+            'check-double'      : ImageTk.PhotoImage(CheckDoubleIcon.resize((12, 12))),
             'note'   : ImageTk.PhotoImage(NoteStickyIcon.resize((12, 12))),
             'square'    : ImageTk.PhotoImage(SquareIcon.resize((12, 12))),
             'square-plus'    : ImageTk.PhotoImage(SquarePlusIcon.resize((12, 12))),
