@@ -17,32 +17,44 @@ class ToolBar(Frame):
         '''
 
         if self.show_add_btn:
+            add_icon = self.master.icons['plus'] if self.master.__str__() == '.' else self.master.master.icons['plus']
             add_btn = Label(
                 self, 
-                text='+',
-                bg='black',
-                fg='white',
-                font='Helvetica 20 normal'
+                image=add_icon,
+                compound='left'
             )
 
             add_btn.bind('<Enter>', self.hover)
             add_btn.bind('<Leave>', self.leave)
             add_btn.bind('<ButtonPress-1>', self.add_btn_command)
-            add_btn.pack(side=LEFT, ipadx=5)
+            add_btn.pack(side=LEFT, padx=5)
 
         if self.show_close_btn:
+            close_icon = self.master.icons['close'] if self.master.__str__() == '.' else self.master.master.icons['close']
             close_btn = Label(
                 self, 
-                text='-',
-                bg='black',
-                fg='white',
-                font='Helvetica 20 normal'
+                image=close_icon,
+                compound='left',
+                name='close'
             )
 
             close_btn.bind('<Enter>', self.hover)
             close_btn.bind('<Leave>', self.leave)
             close_btn.bind('<ButtonPress-1>', self.close_app)
-            close_btn.pack(side=RIGHT, ipadx=5)
+            close_btn.pack(side=RIGHT, padx=5)
+        
+        # minimize_btn = Label(
+        #         self, 
+        #         text='-',
+        #         bg=self['background'],
+        #         fg='white',
+        #         font='Helvetica 20 normal'
+        #     )
+
+        # minimize_btn.bind('<Enter>', self.hover)
+        # minimize_btn.bind('<Leave>', self.leave)
+        # minimize_btn.bind('<ButtonPress-1>', self.close_app)
+        # minimize_btn.pack(side=RIGHT, ipadx=5)
         
         self.bind('<B1-Motion>', lambda e: self.onMotion(e))
     
@@ -50,16 +62,23 @@ class ToolBar(Frame):
         '''
         Change foreground color on mouse enter
         '''
-        if event.widget.cget('text') == '+':
-            event.widget.configure(bg='turquoise')
+        if '.!toolbar.close' in event.widget.__str__():
+            event.widget.configure(bg='crimson')
+        elif not event.widget.cget('text'):
+            event.widget.configure(bg='gold')
         else:
-            event.widget.configure(bg='brown')
+            event.widget.configure(fg='brown')
 
     def leave(self, event=None):
         '''
         Revert foreground color to default
         '''
-        event.widget.configure(bg='black')
+        if '.!toolbar.close' in event.widget.__str__():
+            event.widget.configure(bg='white')
+        elif not event.widget.cget('text'):
+            event.widget.configure(bg='white')
+        else:
+            event.widget.configure(fg='white')
     
     def onMotion(self, event):
         if self.master.__str__() != '.':

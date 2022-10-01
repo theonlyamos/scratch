@@ -66,12 +66,14 @@ class Note(Toplevel):
 
         top_frame = ToolBar(
             self,
-            bg='black'
+            bg='lime'
         )
 
         self.bg_btn = Button(
             top_frame, 
-            text='  ',
+            text='',
+            width=1,
+            height=1,
             bg=self.bg,
             command=self.bg_color
         )
@@ -79,7 +81,9 @@ class Note(Toplevel):
 
         self.fg_btn = Button(
             top_frame, 
-            text='  ',
+            text='',
+            width=1,
+            height=1,
             bg=self.fg,
             command=self.fg_color
         )

@@ -55,7 +55,7 @@ class CheckList(Toplevel):
         '''
         tools_frame = ToolBar(
             self,
-            bg='black',
+            bg='#66FFFF',
             add_btn=True,
             add_btn_command=self.add_item
         )
@@ -68,8 +68,8 @@ class CheckList(Toplevel):
             bg='black',
             fg='white',
             state='disabled',
-            disabledforeground='white',
-            disabledbackground='black',
+            disabledforeground='black',
+            disabledbackground='#66FFFF',
             border=0
         )
         
@@ -85,7 +85,7 @@ class CheckList(Toplevel):
             onvalue=1,
             offvalue=0,
             command=self.toggle_checked,
-            bg='black'
+            bg='#66FFFF'
         ).pack(side=RIGHT)
         
         tools_frame.pack(side=TOP, fill=X)

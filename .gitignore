@@ -1,5 +1,6 @@
 .vscode
 /__pycache__
+/backup
 scratch.db.bak
 scratch.db.dat
 scratch.db.dir

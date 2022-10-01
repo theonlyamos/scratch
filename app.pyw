@@ -1,9 +1,9 @@
 __author__ = 'ph4n70m'
-__version__ = '0.01'
+__version__ = '0.0.4'
 
 from tkinter import *
 from tkinter import ttk
-from PIL import Image, ImageTk
+from PIL import ImageTk
 
 from toolbar import ToolBar
 from note import Note
@@ -13,6 +13,12 @@ from reminder import Reminder
     
 import shelve
 
+from icons import BarsIcon, GearIcon, CalendarPlusIcon,\
+                    CalendarCheckIcon, CalendarDaysIcon, \
+                    PlusIcon, SquareIcon, SquareCheckIcon, \
+                    SquarePlusIcon, TrashCanIcon, CheckIcon, \
+                    XMarkIcon, SquareXMarkIcon, NoteStickyIcon
+
 
 class Scratch(Tk):
     '''
@@ -21,6 +27,9 @@ class Scratch(Tk):
     WIDTH = 250
     HEIGHT = 250
     MENU_OPEN = False
+    SHOW_CHECKLISTS = True
+    SHOW_NOTES = True
+    SHOW_REMINDERS = True
 
     def __init__(self, **kw):
         super().__init__(**kw)
@@ -34,7 +43,25 @@ class Scratch(Tk):
 
         self['background'] = '#161a1d'
 
+        self.build_icons()
         self.content()
+
+    def build_icons(self):
+        self.icons = {
+            'settings'  : ImageTk.PhotoImage(GearIcon.resize((12, 12))),
+            'menu'      : ImageTk.PhotoImage(BarsIcon.resize((12, 12))),
+            'trash'     : ImageTk.PhotoImage(TrashCanIcon.resize((12, 12))),
+            'close'     : ImageTk.PhotoImage(XMarkIcon.resize((8, 12))),
+            'plus'      : ImageTk.PhotoImage(PlusIcon.resize((12, 12))),
+            'check'      : ImageTk.PhotoImage(CheckIcon.resize((12, 12))),
+            'note'   : ImageTk.PhotoImage(NoteStickyIcon.resize((12, 12))),
+            'square'    : ImageTk.PhotoImage(SquareIcon.resize((12, 12))),
+            'square-plus'    : ImageTk.PhotoImage(SquarePlusIcon.resize((12, 12))),
+            'square-check'   : ImageTk.PhotoImage(SquareCheckIcon.resize((12, 12))),
+            'square-close'   : ImageTk.PhotoImage(SquareXMarkIcon.resize((12, 12))),
+            'calendar'       : ImageTk.PhotoImage(CalendarDaysIcon.resize((12, 12))),
+            'calendar-plus'  : ImageTk.PhotoImage(CalendarPlusIcon.resize((12, 12))),
+            'calendar-check' : ImageTk.PhotoImage(CalendarCheckIcon.resize((12, 12)))}
 
     def content(self):
         '''
@@ -50,20 +77,62 @@ class Scratch(Tk):
         
         
 
-        self.top_frame.pack(side=TOP, fill=X)
+        self.top_frame.pack(side=TOP, ipady=10, fill=X)
         
-        # settings_icon = Image.open('images/gear.png').convert('RGBA')
-        # #settings_icon = ImageOps.invert(settings_icon)
-        # settings_icon = ImageTk.PhotoImage(settings_icon.resize((20,20)))
-        
-        # settings_btn = Button(
-        #     self.top_frame,
-        #     image=settings_icon,
-        #     text='',
-        #     compound='left'
-        # )
+        settings_btn = Label(
+            self.top_frame,
+            image=self.icons['settings'],
+            text='',
+            compound='left',
+            name='settings'
+        )
 
-        # #settings_btn.pack(side=RIGHT, ipadx=5)
+        settings_btn.pack(side=RIGHT)
+        settings_btn.bind('<Enter>', self.hover)
+        settings_btn.bind('<Leave>', self.leave)
+        # settings_btn.bind('<ButtonPress-1>', self.close_app)
+        
+        calendar_btn = Label(
+            self.top_frame,
+            image=self.icons['calendar'],
+            text='',
+            compound='left',
+            name='calendar',
+            bg='red' if Scratch.SHOW_CHECKLISTS else 'white'
+        )
+
+        calendar_btn.pack(side=RIGHT, padx=5)
+        calendar_btn.bind('<Enter>', self.hover)
+        calendar_btn.bind('<Leave>', self.leave)
+        calendar_btn.bind('<ButtonPress-1>', lambda e: self.toggle_module(e, 'reminder'))
+        
+        note_btn = Label(
+            self.top_frame,
+            image=self.icons['note'],
+            text='',
+            compound='left',
+            name='note',
+            bg='lime' if Scratch.SHOW_CHECKLISTS else 'white'
+        )
+
+        note_btn.bind('<Enter>', self.hover)
+        note_btn.bind('<Leave>', self.leave)
+        note_btn.bind('<ButtonPress-1>', lambda e: self.toggle_module(e, 'note'))
+        note_btn.pack(side=RIGHT)
+        
+        check_btn = Label(
+            self.top_frame,
+            image=self.icons['check'],
+            text='',
+            compound='left',
+            name='check',
+            bg='#66FFFF' if Scratch.SHOW_CHECKLISTS else 'white'
+        )
+
+        check_btn.pack(side=RIGHT, padx=5)
+        check_btn.bind('<Enter>', self.hover)
+        check_btn.bind('<Leave>', self.leave)
+        check_btn.bind('<ButtonPress-1>', lambda e: self.toggle_module(e, 'checklist'))
 
         self.add_menu_window = None
 
@@ -180,16 +249,32 @@ class Scratch(Tk):
         '''
         Change foreground color on mouse enter
         '''
-        if event.widget.cget('text') == '+':
-            event.widget.configure(bg='turquoise')
+        if event.widget.__str__() == '.!toolbar.settings':
+            event.widget.configure(bg='gold')
+        elif event.widget.__str__() == '.!toolbar.check':
+            event.widget.configure(bg='#66FFFF')
+        elif event.widget.__str__() == '.!toolbar.note':
+            event.widget.configure(bg='lime')
+        elif event.widget.__str__() == '.!toolbar.calendar':
+            event.widget.configure(bg='crimson')
         else:
-            event.widget.configure(bg='brown')
+            event.widget.configure(bg='red')
 
     def leave(self, event=None):
         '''
         Revert foreground color to default
         '''
-        event.widget.configure(bg='black')
+        if event.widget.__str__() == '.!toolbar.check':
+            if not Scratch.SHOW_CHECKLISTS:
+                event.widget.configure(bg='white')
+        elif event.widget.__str__() == '.!toolbar.calendar':
+            if not Scratch.SHOW_REMINDERS:
+                event.widget.configure(bg='white')
+        elif event.widget.__str__() == '.!toolbar.note':
+            if not Scratch.SHOW_NOTES:
+                event.widget.configure(bg='white')
+        else:
+            event.widget.configure(bg='white')
     
     def save(self, event=None):
         '''
@@ -214,6 +299,37 @@ class Scratch(Tk):
             items = db['items']
         db.close()
         return items
+    
+    def toggle_module(self, event, module: str):
+        '''
+        Toggle Modules
+        '''
+        items = self.children.copy()
+        
+        if module == 'reminder':
+            Scratch.SHOW_REMINDERS = False if Scratch.SHOW_REMINDERS else True
+            for item in items:
+                if module in item.__str__():
+                    if not Scratch.SHOW_REMINDERS:
+                        self.children[item].withdraw()
+                    else:
+                        self.children[item].deiconify()
+        elif module == 'checklist':
+            Scratch.SHOW_CHECKLISTS = False if Scratch.SHOW_CHECKLISTS else True
+            for item in items:
+                if module in item.__str__():
+                    if not Scratch.SHOW_CHECKLISTS:
+                        self.children[item].withdraw()
+                    else:
+                        self.children[item].deiconify()
+        elif module == 'note':
+            Scratch.SHOW_NOTES = False if Scratch.SHOW_NOTES else True
+            for item in items:
+                if module in item.__str__():
+                    if not Scratch.SHOW_NOTES:
+                        self.children[item].withdraw()
+                    else:
+                        self.children[item].deiconify()
     
     def reload(self):
         '''

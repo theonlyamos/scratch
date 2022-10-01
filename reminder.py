@@ -59,12 +59,12 @@ class Reminder(Toplevel):
         '''
         tools_frame = ToolBar(
             self,
-            bg='black',
+            bg='crimson',
         )
         
         info_frame = Frame(
             self,
-            bg='black',
+            bg='crimson',
         )
 
         self.title_var = StringVar(value=self.title)
@@ -76,7 +76,7 @@ class Reminder(Toplevel):
             fg='white',
             state='disabled',
             disabledforeground='gold',
-            disabledbackground='black',
+            disabledbackground='crimson',
             border=0
         )
         
