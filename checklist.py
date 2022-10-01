@@ -138,6 +138,16 @@ class CheckList(Toplevel):
     def focus_out(self, event=None):
         event.widget.configure(state='disabled')
         self.master.save()
+    
+    @classmethod
+    def create_sublist(cls, master, title: str = ''):
+        '''
+        Create new list under a checkitem
+        
+        @param title str Label of checkitem
+        @return Type[Classlist]
+        '''
+        return cls(master, title=title, posX = master.get_posX(), posY=master.get_posY())
 
     def show(self):
         self.deiconify()

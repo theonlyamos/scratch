@@ -121,7 +121,11 @@ class CheckItem(Frame):
         '''
         Change foreground color on mouse enter
         '''
-        if event.widget.cget('text') == '+':
+        if '.sublist' in event.widget.__str__():
+            event.widget.configure(bg='#66FFFF')
+        elif '.delete' in event.widget.__str__():
+            event.widget.configure(fg='red')
+        elif event.widget.cget('text') == '+':
             event.widget.configure(bg='turquoise')
         else:
             event.widget.configure(fg='red')
@@ -130,7 +134,12 @@ class CheckItem(Frame):
         '''
         Revert foreground color to default
         '''
-        event.widget.configure(fg='white')
+        if '.sublist' in event.widget.__str__():
+            event.widget.configure(bg='white')
+        elif '.delete' in event.widget.__str__():
+            event.widget.configure(fg='white')
+        else:
+            event.widget.configure(fg='white')
     
     def focus_out(self, event=None):
         self.master.master.save()
@@ -139,6 +148,7 @@ class CheckItem(Frame):
         '''
         Show sublist and delete buttons
         '''
+        self.pack_configure(ipady=0)
         self.close_btn.pack(side=RIGHT, ipadx=5)
         self.sublist_btn.pack(side=RIGHT, padx=2, ipadx=2)
     
@@ -146,6 +156,7 @@ class CheckItem(Frame):
         '''
         Hide sublist and delete buttons
         '''
+        self.pack_configure(ipady=5)
         self.close_btn.pack_forget()
         self.sublist_btn.pack_forget()
     
@@ -161,5 +172,5 @@ class CheckItem(Frame):
         '''
         Create sublist
         '''
-        title = self.label_var.get()
+        new_list = self.master.create_sublist(self.master.master, self.label_var.get())
         
