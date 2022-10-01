@@ -97,7 +97,7 @@ class Reminder(Toplevel):
         self.title_entry.bind('<Return>', self.focus_out)
         self.title_entry.pack(side=LEFT, fill=X, expand=True, padx=5, ipady=5)
         
-        tools_frame.pack(side=TOP, fill=X)
+        tools_frame.pack(side=TOP, ipady=5, fill=X)
         
         self.date_label = Label(
             info_frame,

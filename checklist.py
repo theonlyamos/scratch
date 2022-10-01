@@ -88,7 +88,7 @@ class CheckList(Toplevel):
             bg='#66FFFF'
         ).pack(side=RIGHT)
         
-        tools_frame.pack(side=TOP, fill=X)
+        tools_frame.pack(side=TOP, ipady=5, fill=X)
 
         for item in self.items:
             if not item['checked']:

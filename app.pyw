@@ -170,22 +170,24 @@ class Scratch(Tk):
         if (self.winfo_screenheight() - screen_y) > 200:
             return screen_y + 10
         return 48
-
-        screen_width = self.winfo_screenwidth()
-        width = screen_width - ((last_item['width'] + last_item['posX']).WIDTH*2)
         
     def get_posX(self)->int:
         '''
         Calculate next item veritcal positioning
         '''
         last_item = self.children[list(self.children.keys())[-1]]
+
         screen_y = last_item.winfo_height() + last_item.winfo_y()
         if last_item.winfo_x() == 0:
             return self.posX
         if (self.winfo_screenheight() - screen_y) > 200 and last_item.winfo_x() >= self.posX:
             return self.posX
+        
+        if (self.winfo_screenheight() - screen_y) > 200:
+            return last_item.winfo_x()
 
-        return (self.winfo_screenwidth() - (last_item.winfo_width()*2))-10
+        # return (self.winfo_screenwidth() - (last_item.winfo_width()+last_item.winfo_x()))-10
+        return (last_item.winfo_x() - self.WIDTH)-10
         
 
     def new_item(self, event=None, item='note'):
