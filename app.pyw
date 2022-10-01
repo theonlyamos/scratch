@@ -55,7 +55,7 @@ class Scratch(Tk):
             'close'     : ImageTk.PhotoImage(XMarkIcon.resize((8, 12))),
             'plus'      : ImageTk.PhotoImage(PlusIcon.resize((12, 12))),
             'check'      : ImageTk.PhotoImage(CheckIcon.resize((12, 12))),
-            'check-double'      : ImageTk.PhotoImage(CheckDoubleIcon.resize((12, 12))),
+            'check-double'      : ImageTk.PhotoImage(CheckDoubleIcon.resize((9, 9))),
             'note'   : ImageTk.PhotoImage(NoteStickyIcon.resize((12, 12))),
             'square'    : ImageTk.PhotoImage(SquareIcon.resize((12, 12))),
             'square-plus'    : ImageTk.PhotoImage(SquarePlusIcon.resize((12, 12))),

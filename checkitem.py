@@ -54,21 +54,22 @@ class CheckItem(Frame):
         self.entry.focus()
         self.entry.pack(side=LEFT, fill=BOTH, expand=True, ipady=5)
 
-        close_btn = Label(
+        self.close_btn = Label(
             self, 
             text='-',
             bg='black',
             fg='white',
-            font='Helvetica 20 normal'
+            font='Helvetica 20 normal',
+            name='delete'
         )
 
-        close_btn.bind('<Enter>', self.hover)
-        close_btn.bind('<Leave>', self.leave)
-        close_btn.bind('<ButtonPress-1>', self.delete)
-        close_btn.pack(side=RIGHT, ipadx=5)
+        self.close_btn.bind('<Enter>', self.hover)
+        self.close_btn.bind('<Leave>', self.leave)
+        self.close_btn.bind('<ButtonPress-1>', self.delete)
+        
         
         sublist_icon = self.master.master.icons['check-double']
-        sublist_btn = Label(
+        self.sublist_btn = Label(
             self, 
             image=sublist_icon,
             compound='left',
@@ -76,10 +77,9 @@ class CheckItem(Frame):
             bg='white'
         )
 
-        sublist_btn.bind('<Enter>', self.hover)
-        sublist_btn.bind('<Leave>', self.leave)
-        sublist_btn.bind('<ButtonPress-1>', self.sublist)
-        sublist_btn.pack(side=RIGHT, padx=2, ipadx=2)
+        self.sublist_btn.bind('<Enter>', self.hover)
+        self.sublist_btn.bind('<Leave>', self.leave)
+        self.sublist_btn.bind('<ButtonPress-1>', self.sublist)
         
         # delete_icon = self.master.master.icons['trash']
         # delete_btn = Label(
@@ -95,7 +95,9 @@ class CheckItem(Frame):
         # delete_btn.bind('<ButtonPress-1>', self.delete)
         # delete_btn.pack(side=RIGHT, padx=5, ipadx=2, ipady=2)
 
-        self.pack(side=TOP, fill=BOTH, expand=True, pady=5)
+        self.bind('<Enter>', self.show_btns)
+        self.bind('<Leave>', self.hide_btns)
+        self.pack(side=TOP, fill=BOTH, expand=True, pady=5, ipady=5)
     
     def check(self):
         '''
@@ -132,6 +134,20 @@ class CheckItem(Frame):
     
     def focus_out(self, event=None):
         self.master.master.save()
+        
+    def show_btns(self, event=None):
+        '''
+        Show sublist and delete buttons
+        '''
+        self.close_btn.pack(side=RIGHT, ipadx=5)
+        self.sublist_btn.pack(side=RIGHT, padx=2, ipadx=2)
+    
+    def hide_btns(self, event=None):
+        '''
+        Hide sublist and delete buttons
+        '''
+        self.close_btn.pack_forget()
+        self.sublist_btn.pack_forget()
     
     def delete(self, event=None):
         '''
