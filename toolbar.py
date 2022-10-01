@@ -41,7 +41,7 @@ class ToolBar(Frame):
             close_btn.bind('<Enter>', self.hover)
             close_btn.bind('<Leave>', self.leave)
             close_btn.bind('<ButtonPress-1>', self.close_app)
-            close_btn.pack(side=RIGHT, padx=5)
+            close_btn.pack(side=RIGHT, padx=5, ipadx=3, ipady=3)
         
         # minimize_btn = Label(
         #         self, 

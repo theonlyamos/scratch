@@ -70,7 +70,7 @@ class Scratch(Tk):
 
         self.top_frame = ToolBar(
             self,
-            bg='black',
+            bg='white',
             add_btn=True,
             add_btn_command=self.toggle_add_menu
         )
@@ -82,12 +82,12 @@ class Scratch(Tk):
         settings_btn = Label(
             self.top_frame,
             image=self.icons['settings'],
-            text='',
             compound='left',
-            name='settings'
+            name='settings',
+            bg='white'
         )
 
-        settings_btn.pack(side=RIGHT)
+        settings_btn.pack(side=RIGHT, ipadx=3, ipady=3)
         settings_btn.bind('<Enter>', self.hover)
         settings_btn.bind('<Leave>', self.leave)
         # settings_btn.bind('<ButtonPress-1>', self.close_app)
@@ -98,10 +98,10 @@ class Scratch(Tk):
             text='',
             compound='left',
             name='calendar',
-            bg='red' if Scratch.SHOW_CHECKLISTS else 'white'
+            bg='violet' if Scratch.SHOW_CHECKLISTS else 'white'
         )
 
-        calendar_btn.pack(side=RIGHT, padx=5)
+        calendar_btn.pack(side=RIGHT, padx=5, ipadx=3, ipady=3)
         calendar_btn.bind('<Enter>', self.hover)
         calendar_btn.bind('<Leave>', self.leave)
         calendar_btn.bind('<ButtonPress-1>', lambda e: self.toggle_module(e, 'reminder'))
@@ -118,7 +118,7 @@ class Scratch(Tk):
         note_btn.bind('<Enter>', self.hover)
         note_btn.bind('<Leave>', self.leave)
         note_btn.bind('<ButtonPress-1>', lambda e: self.toggle_module(e, 'note'))
-        note_btn.pack(side=RIGHT)
+        note_btn.pack(side=RIGHT, ipadx=3, ipady=3)
         
         check_btn = Label(
             self.top_frame,
@@ -129,7 +129,7 @@ class Scratch(Tk):
             bg='#66FFFF' if Scratch.SHOW_CHECKLISTS else 'white'
         )
 
-        check_btn.pack(side=RIGHT, padx=5)
+        check_btn.pack(side=RIGHT, padx=5, ipadx=3, ipady=3)
         check_btn.bind('<Enter>', self.hover)
         check_btn.bind('<Leave>', self.leave)
         check_btn.bind('<ButtonPress-1>', lambda e: self.toggle_module(e, 'checklist'))
@@ -256,7 +256,7 @@ class Scratch(Tk):
         elif event.widget.__str__() == '.!toolbar.note':
             event.widget.configure(bg='lime')
         elif event.widget.__str__() == '.!toolbar.calendar':
-            event.widget.configure(bg='crimson')
+            event.widget.configure(bg='violet')
         else:
             event.widget.configure(bg='red')
 
