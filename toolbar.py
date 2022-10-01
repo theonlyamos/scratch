@@ -21,7 +21,9 @@ class ToolBar(Frame):
             add_btn = Label(
                 self, 
                 image=add_icon,
-                compound='left'
+                compound='left',
+                name='add',
+                bg=self['background']
             )
 
             add_btn.bind('<Enter>', self.hover)
@@ -35,7 +37,8 @@ class ToolBar(Frame):
                 self, 
                 image=close_icon,
                 compound='left',
-                name='close'
+                name='close',
+                bg=self['background']
             )
 
             close_btn.bind('<Enter>', self.hover)
@@ -74,7 +77,9 @@ class ToolBar(Frame):
         Revert foreground color to default
         '''
         if '.!toolbar.close' in event.widget.__str__():
-            event.widget.configure(bg='white')
+            event.widget.configure(bg=self['background'])
+        elif '.!toolbar.add' in event.widget.__str__():
+            event.widget.configure(bg=self['background'])
         elif not event.widget.cget('text'):
             event.widget.configure(bg='white')
         else:

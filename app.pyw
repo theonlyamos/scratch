@@ -77,7 +77,7 @@ class Scratch(Tk):
         
         
 
-        self.top_frame.pack(side=TOP, ipady=10, fill=X)
+        self.top_frame.pack(side=TOP, ipady=8, fill=X)
         
         settings_btn = Label(
             self.top_frame,
