@@ -5,10 +5,12 @@ class CheckItem(Frame):
     '''
     Item in check list
     '''
-    def __init__(self,master=None, label='', checked=False, **kw):
-        super().__init__(master, bg='black', **kw)
+    def __init__(self, master=None, label='', checked=False, has_sublists=False, bg = 'black', **kw):
+        super().__init__(master, bg=bg, **kw)
         self.label = label
         self.checked = checked
+        self.has_sublists = has_sublists
+        self.bg = bg
 
         self.content()
     
@@ -19,6 +21,8 @@ class CheckItem(Frame):
         return {
             'label': self.label_var.get(),
             'checked': self.check_var.get(),
+            'has_sublists': self.has_sublists,
+            'bg': self.bg
         }
     
     def content(self):
@@ -97,6 +101,7 @@ class CheckItem(Frame):
 
         self.bind('<Enter>', self.show_btns)
         self.bind('<Leave>', self.hide_btns)
+        
         self.pack(side=TOP, fill=BOTH, expand=True, pady=5, ipady=5)
     
     def check(self):
@@ -106,14 +111,16 @@ class CheckItem(Frame):
         if not self.check_var.get():
             self.entry.configure(state='normal')
             self.entry.configure(fg='white')
-            self.pack_forget()
-            self.pack(side=TOP, fill=X, pady=5)
+            # self.pack_forget()
+            self.pack_configure(side=TOP, fill=BOTH, expand=True, pady=5, ipady=5)
         else:
             self.entry.configure(state='disabled')
             self.entry.configure(fg='#161a1d')
-            self.pack_forget()
-            if self.master.show_checked_var.get():
-                self.pack(side=BOTTOM, fill=X, pady=5)
+
+            # if not self.master.show_checked_var.get():
+            #     self.pack_forget()
+            # else:
+            self.pack_configure(side=BOTTOM, fill=X, expand=True, pady=5)
         
         self.master.master.save()
     
@@ -172,5 +179,11 @@ class CheckItem(Frame):
         '''
         Create sublist
         '''
-        new_list = self.master.create_sublist(self.master.master, self.label_var.get())
+        title = self.label_var.get()
+        item_id = self.__str__()
+   
+        new_list = self.master.create_sublist(self.master.master, title=title, item_id=item_id, bg=self.bg)
+        self.has_sublists = True
+        
+        self.master.master.save()
         

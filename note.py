@@ -9,7 +9,7 @@ class Note(Toplevel):
     New Note Window
     '''
 
-    def __init__(self, master=None, posX=0, posY=0, width=250, text='', bg = '#161a1d', fg = '#fdfffc',  **kw):
+    def __init__(self, master=None, posX=0, posY=0, width=250, text='', bg = '#161a1d', fg = '#fdfffc', locked=False,  **kw):
         super().__init__(master, **kw)
         self.width = width
         self.text = text
@@ -17,6 +17,7 @@ class Note(Toplevel):
         self.fg = fg
         self.posX = posX
         self.posY = posY
+        self.locked= False
 
         self.geometry(f"{width}x200+%d+%d" % (posX, posY))
 
@@ -66,7 +67,7 @@ class Note(Toplevel):
 
         top_frame = ToolBar(
             self,
-            bg='lime'
+            bg='grey60'
         )
 
         self.bg_btn = Button(

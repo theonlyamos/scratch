@@ -8,15 +8,19 @@ class CheckList(Toplevel):
     New CheckList Window
     '''
 
-    def __init__(self, master=None, posX=0, posY=0, title='Title Here', width=250, items:list[dict]=[], text='', bg='#161a1d', fg='#fdfffc', **kw):
+    def __init__(self, master=None, posX=0, posY=0, title='Title Here', width=250, items:list[dict]=[], text='', bg='#161a1d', fg='#fdfffc', is_sublist=False, item_id=None, show_checked=True, locked=False, **kw):
         super().__init__(master, **kw)
         self.items = items
         self.title = title
+        self.is_sublist = is_sublist
+        self.item_id = item_id
+        self.show_checked = show_checked
+        self.locked = locked
+        
         self.posX = posX
         self.posY = posY
         
         self.geometry(f"+%d+%d" % (posX, posY))
-
         self.minsize(width=width, height=40)
         
         self.bg = bg
@@ -46,7 +50,11 @@ class CheckList(Toplevel):
             'bg': self.bg,
             'fg': self.fg,
             'text': self.text,
-            'items': items
+            'items': items,
+            'is_sublist': self.is_sublist,
+            'item_id': self.item_id,
+            'show_checked': self.show_checked,
+            'locked': self.locked
         }
     
     def content(self):
@@ -55,7 +63,7 @@ class CheckList(Toplevel):
         '''
         tools_frame = ToolBar(
             self,
-            bg='#66FFFF',
+            bg='#66FFFF', # if not self.is_sublist else self.bg,
             add_btn=True,
             add_btn_command=self.add_item
         )
@@ -77,16 +85,19 @@ class CheckList(Toplevel):
         self.title_entry.bind('<FocusOut>', self.focus_out)
         self.title_entry.bind('<Return>', self.focus_out)
         self.title_entry.pack(side=LEFT, fill=X, expand=True, ipady=5)
-
-        self.show_checked_var = BooleanVar(value=False)
-        Checkbutton(
-            tools_frame,
-            variable=self.show_checked_var,
-            onvalue=1,
-            offvalue=0,
-            command=self.toggle_checked,
+        
+        check_btn = Label(
+            tools_frame, 
+            image=self.master.icons['square-check'] if self.show_checked else self.master.icons['square'],
+            compound='left',
+            name='check',
             bg='#66FFFF'
-        ).pack(side=RIGHT)
+        )
+
+        check_btn.bind('<Enter>', self.hover)
+        check_btn.bind('<Leave>', self.leave)
+        check_btn.bind('<ButtonPress-1>', self.toggle_checked)
+        check_btn.pack(side=RIGHT, padx=2)
         
         tools_frame.pack(side=TOP, ipady=5, fill=X)
 
@@ -101,22 +112,24 @@ class CheckList(Toplevel):
         self.toggle_checked()
 
     
-    def toggle_checked(self):
+    def toggle_checked(self, event=None):
         '''
         Toggle checked items
         '''
-        if self.show_checked_var.get():
+        if self.show_checked:
+            self.show_checked = False
             for item in self.children.values():
                 if '!checkitem' in item.__str__():
                     if item.check_var.get():
                         item.pack(side=BOTTOM, fill=X, pady=5)
         else:
+            self.show_checked = True
             for item in self.children.values():
                 if '!checkitem' in item.__str__():
                     if item.check_var.get():
-                        item.pack_forget()
-                    
+                        item.pack_forget()              
     
+     
     def add_item(self, event=None):
         '''
         Add new checklist item
@@ -140,15 +153,36 @@ class CheckList(Toplevel):
         self.master.save()
     
     @classmethod
-    def create_sublist(cls, master, title: str = ''):
+    def create_sublist(cls, master, title, item_id, bg):
         '''
         Create new list under a checkitem
         
         @param title str Label of checkitem
         @return Type[Classlist]
         '''
-        return cls(master, title=title, posX = master.get_posX(), posY=master.get_posY())
+        return cls(master, title=title, bg=bg, is_sublist=True, item_id=item_id, posX = master.get_posX(), posY=master.get_posY())
 
+    def hover(self, event=None):
+        '''
+        Change foreground color on mouse enter
+        '''
+        if '.!toolbar.check' in event.widget.__str__():
+            if self.show_checked:
+                event.widget.configure(image=self.master.icons['square-check'])
+            else:
+                event.widget.configure(image=self.master.icons['square'])
+
+    def leave(self, event=None):
+        '''
+        Revert foreground color to default
+        '''
+        if '.!toolbar.check' in event.widget.__str__():
+            if self.show_checked:
+                event.widget.configure(image=self.master.icons['square'])
+            else:
+                event.widget.configure(image=self.master.icons['square-check'])
+
+    
     def show(self):
         self.deiconify()
         self.wm_protocol('WM_DELETE_WINDOW', self.destroy)
