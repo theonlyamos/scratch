@@ -1,16 +1,19 @@
 from tkinter import *
 from tkinter import ttk
+from colours import COLORS
+import random
 
 class CheckItem(Frame):
     '''
     Item in check list
     '''
-    def __init__(self, master=None, label='', checked=False, has_sublists=False, bg = 'black', **kw):
+    def __init__(self, master=None, label='', checked=False, has_sublists=False, bg='black', fg='white', **kw):
         super().__init__(master, bg=bg, **kw)
         self.label = label
         self.checked = checked
         self.has_sublists = has_sublists
         self.bg = bg
+        self.fg = fg
 
         self.content()
     
@@ -22,7 +25,8 @@ class CheckItem(Frame):
             'label': self.label_var.get(),
             'checked': self.check_var.get(),
             'has_sublists': self.has_sublists,
-            'bg': self.bg
+            'bg': self.bg,
+            'fg': self.fg
         }
     
     def content(self):
@@ -31,22 +35,23 @@ class CheckItem(Frame):
         '''
 
         self.check_var = BooleanVar(value=self.checked)
-        Checkbutton(
+        self.check_btn = Checkbutton(
             self,
             variable=self.check_var,
             onvalue=1,
             offvalue=0,
             command=self.check,
-            bg='black'
-        ).pack(side=LEFT)
+            bg=self.bg
+        )
+        self.check_btn.pack(side=LEFT)
 
         self.label_var = StringVar(value=self.label)
 
         self.entry = Entry(
             self,
             textvariable=self.label_var,
-            bg='black',
-            fg='white',
+            bg=self.bg,
+            fg=self.fg,
             border=0,
             font=('Times New Roman', 10, 'normal'),
             justify='left',
@@ -61,7 +66,7 @@ class CheckItem(Frame):
         self.close_btn = Label(
             self, 
             text='-',
-            bg='black',
+            bg=self.bg,
             fg='white',
             font='Helvetica 20 normal',
             name='delete'
@@ -181,9 +186,24 @@ class CheckItem(Frame):
         '''
         title = self.label_var.get()
         item_id = self.__str__()
+        toolbar_bg = random.choice(COLORS[:70])
    
-        new_list = self.master.create_sublist(self.master.master, title=title, item_id=item_id, bg=self.bg)
+        new_list = self.master.create_sublist(self.master.master, title=title, item_id=item_id, toolbar_bg=toolbar_bg)
+        self.reset(toolbar_bg, 'black', True)
+    
+    def reset(self, bg='black', fg='white', has_sublists = False):
+        '''
+        Reset CheckItem to default settings
+        '''
         self.has_sublists = True
+        self.bg = bg
+        self.fg = fg
+        self['background'] = self.bg
+        self.check_btn.configure(bg=self.bg)
+        self.entry.configure(bg=self.bg)
+        self.entry.configure(fg=self.fg)
+        self.sublist_btn.configure(bg=self.bg)
+        self.close_btn.configure(bg=self.bg)
         
         self.master.master.save()
         

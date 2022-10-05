@@ -8,7 +8,7 @@ class CheckList(Toplevel):
     New CheckList Window
     '''
 
-    def __init__(self, master=None, posX=0, posY=0, title='Title Here', width=250, items:list[dict]=[], text='', bg='#161a1d', fg='#fdfffc', is_sublist=False, item_id=None, show_checked=True, locked=False, **kw):
+    def __init__(self, master=None, posX=0, posY=0, title='Title Here', width=250, items:list[dict]=[], text='', bg='#161a1d', fg='#fdfffc', toolbar_bg='#66FFFF', is_sublist=False, item_id=None, show_checked=True, locked=False, **kw):
         super().__init__(master, **kw)
         self.items = items
         self.title = title
@@ -16,6 +16,7 @@ class CheckList(Toplevel):
         self.item_id = item_id
         self.show_checked = show_checked
         self.locked = locked
+        self.toolbar_bg = toolbar_bg
         
         self.posX = posX
         self.posY = posY
@@ -49,6 +50,7 @@ class CheckList(Toplevel):
             'title': self.title_var.get(),
             'bg': self.bg,
             'fg': self.fg,
+            'toolbar_bg': self.toolbar_bg,
             'text': self.text,
             'items': items,
             'is_sublist': self.is_sublist,
@@ -63,7 +65,7 @@ class CheckList(Toplevel):
         '''
         tools_frame = ToolBar(
             self,
-            bg='#66FFFF', # if not self.is_sublist else self.bg,
+            bg=self.toolbar_bg, # if not self.is_sublist else self.bg,
             add_btn=True,
             add_btn_command=self.add_item
         )
@@ -77,7 +79,7 @@ class CheckList(Toplevel):
             fg='white',
             state='disabled',
             disabledforeground='black',
-            disabledbackground='#66FFFF',
+            disabledbackground=self.toolbar_bg,
             border=0
         )
         
@@ -91,7 +93,7 @@ class CheckList(Toplevel):
             image=self.master.icons['square-check'] if self.show_checked else self.master.icons['square'],
             compound='left',
             name='check',
-            bg='#66FFFF'
+            bg=self.toolbar_bg
         )
 
         check_btn.bind('<Enter>', self.hover)
@@ -153,14 +155,14 @@ class CheckList(Toplevel):
         self.master.save()
     
     @classmethod
-    def create_sublist(cls, master, title, item_id, bg):
+    def create_sublist(cls, master, title, item_id, toolbar_bg):
         '''
         Create new list under a checkitem
         
         @param title str Label of checkitem
         @return Type[Classlist]
         '''
-        return cls(master, title=title, bg=bg, is_sublist=True, item_id=item_id, posX = master.get_posX(), posY=master.get_posY())
+        return cls(master, title=title, toolbar_bg=toolbar_bg, is_sublist=True, item_id=item_id, posX = master.get_posX(), posY=master.get_posY())
 
     def hover(self, event=None):
         '''
@@ -181,7 +183,6 @@ class CheckList(Toplevel):
                 event.widget.configure(image=self.master.icons['square'])
             else:
                 event.widget.configure(image=self.master.icons['square-check'])
-
     
     def show(self):
         self.deiconify()

@@ -123,6 +123,15 @@ class ToolBar(Frame):
         toplevel = self.master if self.master.__str__() == '.' else self.master.master
         toplevel.save()
         
+        if self.master.__str__() != '.':
+            parent = self.master.to_object()
+            if parent['is_sublist']:
+                check_item = parent['item_id'].split('.')[-1]
+                parent_id = parent['item_id'].split('.')[1]
+                
+                checklist = self.master.master.children[parent_id]
+                checklist.children[check_item].reset()
+        
         if toplevel.__str__() != self.master.__str__():
             self.master.destroy()
             toplevel.save()
