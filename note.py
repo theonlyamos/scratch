@@ -9,7 +9,7 @@ class Note(Toplevel):
     New Note Window
     '''
 
-    def __init__(self, master=None, posX=0, posY=0, width=250, text='', bg = '#161a1d', fg = '#fdfffc', locked=False,  **kw):
+    def __init__(self, master=None, posX=0, posY=0, width=250, text='', bg = '#161a1d', fg = '#fdfffc', locked=False, is_withdrawn=False,  **kw):
         super().__init__(master, **kw)
         self.width = width
         self.text = text
@@ -17,7 +17,8 @@ class Note(Toplevel):
         self.fg = fg
         self.posX = posX
         self.posY = posY
-        self.locked= False
+        self.locked= locked
+        self.is_withdrawn = is_withdrawn
 
         self.geometry(f"{width}x200+%d+%d" % (posX, posY))
 
@@ -39,7 +40,9 @@ class Note(Toplevel):
             'height': self.winfo_height(),
             'bg': self.bg,
             'fg': self.fg,
-            'text': self.textpad.get('1.0', END)
+            'text': self.textpad.get('1.0', END),
+            'locked': self.locked,
+            'is_withdrawn': self.is_withdrawn
         }
     
     def bg_color(self, event=None):

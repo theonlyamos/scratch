@@ -174,6 +174,7 @@ class Scratch(Tk):
                 print('Not a valid type')
 
         self.bind('<FocusOut>', self.save)
+        self.toggle_modules_on_start()
     
     def get_posY(self)->int:
         '''
@@ -351,24 +352,43 @@ class Scratch(Tk):
                 if module in item.__str__():
                     if not Scratch.SHOW_REMINDERS and not self.children[item].locked:
                         self.children[item].withdraw()
+                        self.children[item].is_withdrawn = True
                     else:
                         self.children[item].deiconify()
+                        self.children[item].is_withdrawn = False
         elif module == 'checklist':
             Scratch.SHOW_CHECKLISTS = False if Scratch.SHOW_CHECKLISTS else True
             for item in items:
                 if module in item.__str__():
                     if not Scratch.SHOW_CHECKLISTS and not self.children[item].locked:
                         self.children[item].withdraw()
+                        self.children[item].is_withdrawn = True
                     else:
                         self.children[item].deiconify()
+                        self.children[item].is_withdrawn = False
         elif module == 'note':
             Scratch.SHOW_NOTES = False if Scratch.SHOW_NOTES else True
             for item in items:
                 if module in item.__str__():
                     if not Scratch.SHOW_NOTES and not self.children[item].locked:
                         self.children[item].withdraw()
+                        self.children[item].is_withdrawn = True
                     else:
                         self.children[item].deiconify()
+                        self.children[item].is_withdrawn = False
+    
+    def toggle_modules_on_start(self):
+        '''
+        Toggle All Modules
+        '''
+        items = self.children.copy()
+        
+        for item in items:
+            item_id = item.__str__()
+            if 'reminder' in item_id or 'checklist' in item_id or 'note' in item_id:
+                if self.children[item].is_withdrawn:
+                    self.children[item].withdraw()
+                    self.children[item].is_withdrawn = True
      
     def reload(self):
         '''

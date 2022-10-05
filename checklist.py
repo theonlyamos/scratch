@@ -8,7 +8,7 @@ class CheckList(Toplevel):
     New CheckList Window
     '''
 
-    def __init__(self, master=None, posX=0, posY=0, title='Title Here', width=250, items:list[dict]=[], text='', bg='#161a1d', fg='#fdfffc', toolbar_bg='#66FFFF', is_sublist=False, item_id=None, show_checked=True, locked=False, **kw):
+    def __init__(self, master=None, posX=0, posY=0, title='Title Here', width=250, items:list[dict]=[], text='', bg='#161a1d', fg='#fdfffc', toolbar_bg='#66FFFF', is_sublist=False, item_id=None, show_checked=True, locked=False, is_withdrawn=False, **kw):
         super().__init__(master, **kw)
         self.items = items
         self.title = title
@@ -17,6 +17,7 @@ class CheckList(Toplevel):
         self.show_checked = show_checked
         self.locked = locked
         self.toolbar_bg = toolbar_bg
+        self.is_withdrawn = is_withdrawn
         
         self.posX = posX
         self.posY = posY
@@ -56,7 +57,8 @@ class CheckList(Toplevel):
             'is_sublist': self.is_sublist,
             'item_id': self.item_id,
             'show_checked': self.show_checked,
-            'locked': self.locked
+            'locked': self.locked,
+            'is_withdrawn': self.is_withdrawn
         }
     
     def content(self):

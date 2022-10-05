@@ -14,7 +14,7 @@ class Reminder(Toplevel):
     MONTHS = ('January', 'February', 'March', 'April', 'May', 'June',
               'July', 'August', 'September', 'October', 'November', 'December')
 
-    def __init__(self, master=None, posX=0, posY=0, title='Title Here', date_time=datetime.utcnow(), width=250, height=120, bg='#161a1d', fg='#fdfffc', locked=False, **kw):
+    def __init__(self, master=None, posX=0, posY=0, title='Title Here', date_time=datetime.utcnow(), width=250, height=120, bg='#161a1d', fg='#fdfffc', locked=False, is_withdrawn=False, **kw):
         super().__init__(master, **kw)
         self.date_time = date_time
         self.year = date_time.year
@@ -24,7 +24,8 @@ class Reminder(Toplevel):
         self.title = title
         self.posX = posX
         self.posY = posY
-        self.locked = False
+        self.locked = locked
+        self.is_withdrawn = is_withdrawn
         
         self.geometry(f"{width}x{height}+%d+%d" % (posX, posY))
 
@@ -51,7 +52,9 @@ class Reminder(Toplevel):
             'title': self.title_var.get(),
             'bg': self.bg,
             'fg': self.fg,
-            'date_time': self.date_time
+            'date_time': self.date_time,
+            'locked': self.locked,
+            'is_withdrawn': self.is_withdrawn
         }
     
     def content(self):

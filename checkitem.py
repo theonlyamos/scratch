@@ -184,12 +184,25 @@ class CheckItem(Frame):
         '''
         Create sublist
         '''
-        title = self.label_var.get()
-        item_id = self.__str__()
-        toolbar_bg = random.choice(COLORS[:70])
-   
-        new_list = self.master.create_sublist(self.master.master, title=title, item_id=item_id, toolbar_bg=toolbar_bg)
-        self.reset(toolbar_bg, 'black', True)
+        if self.has_sublists:
+            for child in self.master.master.children:
+                if 'checklist' in child.__str__():
+                    child_id = self.master.master.children[child].item_id
+                    if child_id and child_id.split('.')[1] == self.__str__().split('.')[1]:
+                        child_list = self.master.master.children[child]
+                        if child_list.is_withdrawn:
+                            child_list.deiconify()
+                            child_list.is_withdrawn = False
+                        else:
+                            child_list.withdraw()
+                            child_list.is_withdrawn = True
+        else:
+            title = self.label_var.get()
+            item_id = self.__str__()
+            toolbar_bg = random.choice(COLORS[:70])
+    
+            new_list = self.master.create_sublist(self.master.master, title=title, item_id=item_id, toolbar_bg=toolbar_bg)
+            self.reset(toolbar_bg, 'black', True)
     
     def reset(self, bg='black', fg='white', has_sublists = False):
         '''
