@@ -202,9 +202,11 @@ class Reminder(Toplevel):
         try:
             while True:
                 self.days_left_label.configure(text=self.get_days_left())
-                
-                difference =  (self.date_time - datetime.utcnow()).days
-                if not difference:
+
+                difference = self.date_time - datetime.utcnow()
+                remaining_days = difference.days
+                print(difference.__str__())
+                if remaining_days < 1:
                     self.days_left_label.configure(fg='red')
                 else:
                     self.days_left_label.configure(fg='lime')

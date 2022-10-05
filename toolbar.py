@@ -72,7 +72,7 @@ class ToolBar(Frame):
         # minimize_btn.bind('<ButtonPress-1>', self.close_app)
         # minimize_btn.pack(side=RIGHT, ipadx=5)
         
-        self.bind('<B1-Motion>', lambda e: self.onMotion(e))
+        self.bind('<B1-Motion>', lambda e: self.on_motion(e))
     
     def hover(self, event=None):
         '''
@@ -107,7 +107,7 @@ class ToolBar(Frame):
         else:
             event.widget.configure(fg='white')
     
-    def onMotion(self, event):
+    def on_motion(self, event):
         if self.master.__str__() != '.':
             deltax = event.x
             deltay = event.y

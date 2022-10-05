@@ -202,19 +202,20 @@ class CheckItem(Frame):
             toolbar_bg = random.choice(COLORS[:70])
     
             new_list = self.master.create_sublist(self.master.master, title=title, item_id=item_id, toolbar_bg=toolbar_bg)
-            self.reset(toolbar_bg, 'black', True)
+            self.reset(toolbar_bg, 'black', True, 'bold')
     
-    def reset(self, bg='black', fg='white', has_sublists = False):
+    def reset(self, bg='black', fg='white', has_sublists = False, font_weight='normal'):
         '''
         Reset CheckItem to default settings
         '''
-        self.has_sublists = True
+        self.has_sublists = has_sublists
         self.bg = bg
         self.fg = fg
         self['background'] = self.bg
         self.check_btn.configure(bg=self.bg)
         self.entry.configure(bg=self.bg)
         self.entry.configure(fg=self.fg)
+        self.entry.configure(font=('Times New Roman', 10, font_weight),)
         self.sublist_btn.configure(bg=self.bg)
         self.close_btn.configure(bg=self.bg)
         
