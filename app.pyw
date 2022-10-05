@@ -84,7 +84,9 @@ class Scratch(Tk):
         '''
         Main self Components
         '''
-
+        # Load Items from DB
+        items = self.load()
+        
         self.top_frame = ToolBar(
             self,
             bg='white',
@@ -112,7 +114,7 @@ class Scratch(Tk):
         
         calendar_btn = Label(
             self.top_frame,
-            image=self.icons['calendar-check'] if Scratch.SHOW_CHECKLISTS else self.icons['calendar'],
+            image=self.icons['calendar-check'] if Scratch.SHOW_REMINDERS else self.icons['calendar'],
             text='',
             compound='left',
             name='calendar'
@@ -138,7 +140,7 @@ class Scratch(Tk):
         
         check_btn = Label(
             self.top_frame,
-            image=self.icons['square-check'] if Scratch.SHOW_NOTES else self.icons['square'],
+            image=self.icons['square-check'] if Scratch.SHOW_CHECKLISTS else self.icons['square'],
             text='',
             compound='left',
             name='check'
@@ -151,7 +153,7 @@ class Scratch(Tk):
 
         self.add_menu_window = None
 
-        items = self.load()
+        # Show Loaded Items
         new_pos = 0
         
         for index, item in enumerate(items):
@@ -326,6 +328,9 @@ class Scratch(Tk):
                 items.append(self.children[item].to_object())
 
         db = shelve.open('scratch.db')
+        db['show_checklists'] = Scratch.SHOW_CHECKLISTS
+        db['show_reminders'] = Scratch.SHOW_REMINDERS
+        db['show_notes'] = Scratch.SHOW_NOTES
         db['items'] = items
         db.close()
     
@@ -335,8 +340,17 @@ class Scratch(Tk):
         '''
         db = shelve.open('scratch.db')
         items = []
+        
         if 'items' in db.keys():
             items = db['items']
+        
+        if 'show_checklists' in db.keys():
+            Scratch.SHOW_CHECKLISTS = db['show_checklists']
+        if 'show_reminders' in db.keys():
+            Scratch.SHOW_REMINDERS = db['show_reminders']
+        if 'show_notes' in db.keys():
+            Scratch.SHOW_NOTES = db['show_notes']
+            
         db.close()
         return items
     
