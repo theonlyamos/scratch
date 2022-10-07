@@ -205,7 +205,7 @@ class Reminder(Toplevel):
 
                 difference = self.date_time - datetime.utcnow()
                 remaining_days = difference.days
-                print(difference.__str__())
+                # print(difference.__str__())
                 if remaining_days < 1:
                     self.days_left_label.configure(fg='red')
                 else:
