@@ -124,8 +124,8 @@ class ToolBar(Frame):
         toplevel.save()
         
         if self.master.__str__() != '.' and 'checklist' in self.master.__str__():
-            parent = self.master.to_object()
-            if parent['is_sublist']:
+            parent = self.master
+            if parent.is_sublist:
                 check_item = parent['item_id'].split('.')[-1]
                 parent_id = parent['item_id'].split('.')[1]
                 

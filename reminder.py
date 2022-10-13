@@ -5,7 +5,7 @@ from tkinter.ttk import Combobox
 
 from toolbar import ToolBar
 
-from datetime import datetime
+from datetime import datetime, timedelta
 
 class Reminder(Toplevel):
     '''
@@ -26,6 +26,7 @@ class Reminder(Toplevel):
         self.posY = posY
         self.locked = locked
         self.is_withdrawn = is_withdrawn
+        self.expired = False
         
         self.geometry(f"{width}x{height}+%d+%d" % (posX, posY))
 
@@ -186,7 +187,27 @@ class Reminder(Toplevel):
         
         check_thread = Thread(target=self.check_days_left)
         check_thread.daemon = True
+
+        expired_thread = Thread(target=self.blink)
+        expired_thread.daemon = True
+
+        self.bind('<<OnExpired>>', lambda e: expired_thread.start())
         self.after(100, lambda: check_thread.start())
+
+    def blink(self):
+        '''
+        Blink days left on expire
+        '''
+        on = True
+        try:
+            while True:
+                if self.expired:
+                    self.days_left_label.configure(fg='red' if on else 'black')
+                    self.update_idletasks()
+                    on = False if on else True
+                sleep(0.5)
+        except:
+            pass
     
     def get_days_left(self)->str:
         '''
@@ -208,7 +229,11 @@ class Reminder(Toplevel):
                 # print(difference.__str__())
                 if remaining_days < 1:
                     self.days_left_label.configure(fg='red')
+                    if not self.expired:
+                        self.expired = True
+                        self.event_generate('<<OnExpired>>', when='tail')
                 else:
+                    self.expired = False
                     self.days_left_label.configure(fg='lime')
                 self.update_idletasks()
                 

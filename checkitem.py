@@ -63,19 +63,32 @@ class CheckItem(Frame):
         self.entry.focus()
         self.entry.pack(side=LEFT, fill=BOTH, expand=True, ipady=5)
 
-        self.close_btn = Label(
+        # self.delete_btn = Label(
+        #     self, 
+        #     text='-',
+        #     bg=self.bg,
+        #     fg='white',
+        #     font='Helvetica 20 normal',
+        #     name='delete'
+        # )
+
+        # self.delete_btn.bind('<Enter>', self.hover)
+        # self.delete_btn.bind('<Leave>', self.leave)
+        # self.delete_btn.bind('<ButtonPress-1>', self.delete)
+        
+        delete_icon = self.master.master.icons['trash']
+        self.delete_btn = Label(
             self, 
-            text='-',
-            bg=self.bg,
-            fg='white',
-            font='Helvetica 20 normal',
-            name='delete'
+            image=delete_icon,
+            compound='left',
+            name='delete',
+            bg='white'
         )
 
-        self.close_btn.bind('<Enter>', self.hover)
-        self.close_btn.bind('<Leave>', self.leave)
-        self.close_btn.bind('<ButtonPress-1>', self.delete)
-        
+        self.delete_btn.bind('<Enter>', self.hover)
+        self.delete_btn.bind('<Leave>', self.leave)
+        self.delete_btn.bind('<ButtonPress-1>', self.delete)
+        # self.delete_btn.pack(side=RIGHT, padx=5, ipadx=2, ipady=2)
         
         sublist_icon = self.master.master.icons['check-double']
         self.sublist_btn = Label(
@@ -89,20 +102,6 @@ class CheckItem(Frame):
         self.sublist_btn.bind('<Enter>', self.hover)
         self.sublist_btn.bind('<Leave>', self.leave)
         self.sublist_btn.bind('<ButtonPress-1>', self.sublist)
-        
-        # delete_icon = self.master.master.icons['trash']
-        # delete_btn = Label(
-        #     self, 
-        #     image=delete_icon,
-        #     compound='left',
-        #     name='delete',
-        #     bg='white'
-        # )
-
-        # delete_btn.bind('<Enter>', self.hover)
-        # delete_btn.bind('<Leave>', self.leave)
-        # delete_btn.bind('<ButtonPress-1>', self.delete)
-        # delete_btn.pack(side=RIGHT, padx=5, ipadx=2, ipady=2)
 
         self.bind('<Enter>', self.show_btns)
         self.bind('<Leave>', self.hide_btns)
@@ -136,7 +135,7 @@ class CheckItem(Frame):
         if '.sublist' in event.widget.__str__():
             event.widget.configure(bg='#66FFFF')
         elif '.delete' in event.widget.__str__():
-            event.widget.configure(fg='red')
+            event.widget.configure(bg='red')
         elif event.widget.cget('text') == '+':
             event.widget.configure(bg='turquoise')
         else:
@@ -149,7 +148,7 @@ class CheckItem(Frame):
         if '.sublist' in event.widget.__str__():
             event.widget.configure(bg='white')
         elif '.delete' in event.widget.__str__():
-            event.widget.configure(fg='white')
+            event.widget.configure(bg='white')
         else:
             event.widget.configure(fg='white')
     
@@ -160,16 +159,16 @@ class CheckItem(Frame):
         '''
         Show sublist and delete buttons
         '''
-        self.pack_configure(ipady=0)
-        self.close_btn.pack(side=RIGHT, ipadx=5)
-        self.sublist_btn.pack(side=RIGHT, padx=2, ipadx=2)
+        #self.pack_configure(ipady=0)
+        self.delete_btn.pack(side=RIGHT, padx=3)
+        self.sublist_btn.pack(side=RIGHT, padx=2)
     
     def hide_btns(self, event=None):
         '''
         Hide sublist and delete buttons
         '''
-        self.pack_configure(ipady=5)
-        self.close_btn.pack_forget()
+        #self.pack_configure(ipady=5)
+        self.delete_btn.pack_forget()
         self.sublist_btn.pack_forget()
     
     def delete(self, event=None):
@@ -199,7 +198,7 @@ class CheckItem(Frame):
         else:
             title = self.label_var.get()
             item_id = self.__str__()
-            toolbar_bg = random.choice(COLORS[:70])
+            toolbar_bg = random.choice(COLORS[17:358]) # if not self.master.is_sublist else self.master.toolbar_bg
     
             new_list = self.master.create_sublist(self.master.master, title=title, item_id=item_id, toolbar_bg=toolbar_bg)
             self.reset(toolbar_bg, 'black', True, 'bold')
@@ -217,7 +216,7 @@ class CheckItem(Frame):
         self.entry.configure(fg=self.fg)
         self.entry.configure(font=('Times New Roman', 10, font_weight),)
         self.sublist_btn.configure(bg=self.bg)
-        self.close_btn.configure(bg=self.bg)
+        self.delete_btn.configure(bg=self.bg)
         
         self.master.master.save()
         

@@ -84,8 +84,9 @@ class CheckList(Toplevel):
             disabledbackground=self.toolbar_bg,
             border=0
         )
-        
-        self.title_entry.bind('<Double-1>', self.focus_in)
+
+        if not self.is_sublist:
+            self.title_entry.bind('<Double-1>', self.focus_in)
         self.title_entry.bind('<FocusOut>', self.focus_out)
         self.title_entry.bind('<Return>', self.focus_out)
         self.title_entry.pack(side=LEFT, fill=X, expand=True, ipady=5)
