@@ -72,7 +72,9 @@ class ToolBar(Frame):
         # minimize_btn.bind('<ButtonPress-1>', self.close_app)
         # minimize_btn.pack(side=RIGHT, ipadx=5)
         
-        self.bind('<B1-Motion>', lambda e: self.on_motion(e))
+        self.bind("<ButtonPress-1>", self.start_move)
+        self.bind("<ButtonRelease-1>", self.stop_move)
+        self.bind('<B1-Motion>', self.on_motion)
     
     def hover(self, event=None):
         '''
@@ -107,13 +109,21 @@ class ToolBar(Frame):
         else:
             event.widget.configure(fg='white')
     
+    def start_move(self, event):
+        self.master.x = event.x
+        self.master.y = event.y
+
+    def stop_move(self, event):
+        self.master.x = None
+        self.master.y = None
+    
     def on_motion(self, event):
         if self.master.__str__() != '.':
-            deltax = event.x
-            deltay = event.y
+            deltax = event.x - self.master.x
+            deltay = event.y - self.master.y
             x = self.master.winfo_x()+deltax
             y = self.master.winfo_y()+deltay
-            self.master.geometry("+%s+%s" %(x, y))
+            self.master.geometry(f"+{x}+{y}")
             self.master.master.save()
     
     def close_app(self, event=None):
