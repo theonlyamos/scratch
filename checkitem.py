@@ -187,7 +187,7 @@ class CheckItem(Frame):
             for child in self.master.master.children:
                 if 'checklist' in child.__str__():
                     child_id = self.master.master.children[child].item_id
-                    if child_id and child_id.split('.')[1] == self.__str__().split('.')[1]:
+                    if child_id and child_id.split('.')[2] == self.__str__().split('.')[2]:
                         child_list = self.master.master.children[child]
                         if child_list.is_withdrawn:
                             child_list.deiconify()
