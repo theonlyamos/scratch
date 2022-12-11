@@ -4,12 +4,15 @@ __version__ = '0.0.4'
 from tkinter import *
 from tkinter import ttk
 from PIL import ImageTk
+from threading import Thread
 
 from toolbar import ToolBar
 from note import Note
 from checklist import CheckList
 from addmenu import AddMenu
 from reminder import Reminder
+
+from sync import backup, auto_backup
     
 import shelve
 
@@ -49,6 +52,7 @@ class Scratch(Tk):
 
         self.build_icons()
         self.content()
+        #self.after(30, self.start_auto_backup_thread)
 
     def build_icons(self):
         self.icons = {
@@ -79,7 +83,17 @@ class Scratch(Tk):
             'lock' : ImageTk.PhotoImage(LockIcon.resize((12, 12))),
             'unlock' : ImageTk.PhotoImage(LockOpenIcon.resize((13, 12))),
             'square-minus' : ImageTk.PhotoImage(SquareMinusIcon.resize((12, 12)))}
-
+    
+    def start_auto_backup_thread(self):
+        b_thread = Thread(target=auto_backup, args=())
+        b_thread.daemon = True
+        b_thread.start()
+    
+    def start_backup_thread(self):
+        b_thread = Thread(target=backup, args=())
+        b_thread.daemon = True
+        b_thread.start()
+    
     def content(self):
         '''
         Main self Components
@@ -333,6 +347,8 @@ class Scratch(Tk):
         db['show_notes'] = Scratch.SHOW_NOTES
         db['items'] = items
         db.close()
+
+        self.start_backup_thread()
     
     def load(self, event=None):
         '''
