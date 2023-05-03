@@ -8,12 +8,13 @@ class CheckList(Toplevel):
     New CheckList Window
     '''
 
-    def __init__(self, master=None, posX=0, posY=0, title='Title Here', width=250, items:list[dict]=[], text='', bg='#161a1d', fg='#fdfffc', toolbar_bg='#66FFFF', is_sublist=False, item_id=None, show_checked=True, locked=False, is_withdrawn=False, **kw):
+    def __init__(self, master=None,_id=None, posX=0, posY=0, title='Title Here', width=250, items:list[dict]=[], text='', bg='#161a1d', fg='#fdfffc', toolbar_bg='#66FFFF', is_sublist=False, parent_item=None, show_checked=True, locked=False, is_withdrawn=False, **kw):
         super().__init__(master, **kw)
+        self._id = _id
         self.items = items
         self.title = title
         self.is_sublist = is_sublist
-        self.item_id = item_id
+        self.parent_item = parent_item
         self.show_checked = show_checked
         self.locked = locked
         self.toolbar_bg = toolbar_bg
@@ -43,6 +44,7 @@ class CheckList(Toplevel):
                 items.append(self.children[key].to_object())
                 
         return {
+            '_id': self._id,
             'type': 'checklist',
             'posX': self.winfo_x(),
             'posY': self.winfo_y(),
@@ -55,7 +57,7 @@ class CheckList(Toplevel):
             'text': self.text,
             'items': items,
             'is_sublist': self.is_sublist,
-            'item_id': self.item_id,
+            'parent_item': self.parent_item,
             'show_checked': self.show_checked,
             'locked': self.locked,
             'is_withdrawn': self.is_withdrawn
@@ -158,14 +160,14 @@ class CheckList(Toplevel):
         self.master.save()
     
     @classmethod
-    def create_sublist(cls, master, title, item_id, toolbar_bg):
+    def create_sublist(cls, master, title, parent_item, toolbar_bg):
         '''
         Create new list under a checkitem
         
         @param title str Label of checkitem
         @return Type[Classlist]
         '''
-        return cls(master, title=title, toolbar_bg=toolbar_bg, is_sublist=True, item_id=item_id, posX = master.get_posX(), posY=master.get_posY())
+        return cls(master, title=title, toolbar_bg=toolbar_bg, is_sublist=True, parent_item=parent_item, posX = master.get_posX(), posY=master.get_posY())
 
     def hover(self, event=None):
         '''

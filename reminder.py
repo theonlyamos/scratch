@@ -14,8 +14,9 @@ class Reminder(Toplevel):
     MONTHS = ('January', 'February', 'March', 'April', 'May', 'June',
               'July', 'August', 'September', 'October', 'November', 'December')
 
-    def __init__(self, master=None, posX=0, posY=0, title='Title Here', date_time=datetime.utcnow(), width=250, height=120, bg='#161a1d', fg='#fdfffc', locked=False, is_withdrawn=False, **kw):
+    def __init__(self, master=None, _id=None, posX=0, posY=0, title='Title Here', date_time=datetime.utcnow(), width=250, height=120, bg='#161a1d', fg='#fdfffc', locked=False, is_withdrawn=False, **kw):
         super().__init__(master, **kw)
+        self._id = _id
         self.date_time = date_time
         self.year = date_time.year
         self.month = date_time.month
@@ -45,6 +46,7 @@ class Reminder(Toplevel):
         '''
          
         return {
+            '_id': self._id,
             'type': 'reminder',
             'posX': self.winfo_x(),
             'posY': self.winfo_y(),

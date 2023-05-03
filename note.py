@@ -9,8 +9,9 @@ class Note(Toplevel):
     New Note Window
     '''
 
-    def __init__(self, master=None, posX=0, posY=0, width=250, text='', bg = '#161a1d', fg = '#fdfffc', locked=False, is_withdrawn=False,  **kw):
+    def __init__(self, master=None, _id=None, posX=0, posY=0, width=250, text='', bg = '#161a1d', fg = '#fdfffc', locked=False, is_withdrawn=False,  **kw):
         super().__init__(master, **kw)
+        self._id = _id
         self.width = width
         self.text = text
         self.bg = bg
@@ -33,6 +34,7 @@ class Note(Toplevel):
         Convert to object for saving
         '''
         return {
+            '_id': self._id,
             'type': 'note',
             'posX': self.winfo_x(),
             'posY': self.winfo_y(),

@@ -7,8 +7,9 @@ class CheckItem(Frame):
     '''
     Item in check list
     '''
-    def __init__(self, master=None, label='', checked=False, has_sublists=False, bg='black', fg='white', **kw):
+    def __init__(self, master=None, _id=None, label='', checked=False, has_sublists=False, bg='black', fg='white', **kw):
         super().__init__(master, bg=bg, **kw)
+        self._id = _id
         self.label = label
         self.checked = checked
         self.has_sublists = has_sublists
@@ -22,6 +23,7 @@ class CheckItem(Frame):
         Convert to object for saving
         '''
         return {
+            '_id': self._id,
             'label': self.label_var.get(),
             'checked': self.check_var.get(),
             'has_sublists': self.has_sublists,

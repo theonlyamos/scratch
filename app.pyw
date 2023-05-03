@@ -12,10 +12,11 @@ from checklist import CheckList
 from addmenu import AddMenu
 from reminder import Reminder
 
-from sync import backup, auto_backup
-    
+from runit_database import Document
+from datetime import datetime
+from time import sleep
 import shelve
-
+    
 from icons import BarsIcon, CalendarXMarkIcon, GearIcon, CalendarPlusIcon,\
                     CalendarCheckIcon, CalendarDaysIcon, \
                     PlusIcon, SquareIcon, SquareCheckIcon, \
@@ -26,6 +27,12 @@ from icons import BarsIcon, CalendarXMarkIcon, GearIcon, CalendarPlusIcon,\
                     CalendarXMarkIcon, CalendarIcon, CircleXMarkIcon, \
                     CircleXMarkRIcon, LockIcon, LockOpenIcon, ClockIcon
 
+
+Document.initialize(
+    'http://runit.test:9000/api',
+    'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY3NDg1NDgyNiwianRpIjoiMTNkOTEyZmUtOGI2Zi00ZmQxLWJmYjAtNDA0Y2IzMTA4YWY3IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjYzNWFiM2EzNzU0NGFjZDZjZDAyZGVkMiIsIm5iZiI6MTY3NDg1NDgyNiwiZXhwIjoxNjc3NDQ2ODI2fQ.CMnKSzYb7iscYq3Lu2MS_rFnq7KwL9Wl0zW3Rdy6UfQ',
+    '63d6a50cf55a1a560f5a6de4'
+)
 
 class Scratch(Tk):
     '''
@@ -85,12 +92,12 @@ class Scratch(Tk):
             'square-minus' : ImageTk.PhotoImage(SquareMinusIcon.resize((12, 12)))}
     
     def start_auto_backup_thread(self):
-        b_thread = Thread(target=auto_backup, args=())
+        b_thread = Thread(target=self.auto_backup, args=())
         b_thread.daemon = True
         b_thread.start()
     
     def start_backup_thread(self):
-        b_thread = Thread(target=backup, args=())
+        b_thread = Thread(target=self.backup, args=())
         b_thread.daemon = True
         b_thread.start()
     
@@ -423,6 +430,8 @@ class Scratch(Tk):
     def reload(self):
         '''
         Rearrange items on item deletion
+        
+        @return None
         '''
         pass
         # items = self.children.copy()
@@ -432,6 +441,44 @@ class Scratch(Tk):
         #         self.children[item].destroy()
         
         # self.content()
+    
+    def backup(self):
+        ''''
+        Backup app to online database
+        
+        @return None
+        '''
+        try:
+            items = self.children.copy()
+            
+            for item in items:
+                if not '!toolbar' in item and not '!addmenu' in item:
+                    backup_item = self.children[item].to_object()
+                    
+                    if backup_item['type'] == 'reminder':
+                        dt = backup_item['date_time']
+                        backup_item['date_time'] = dt.strftime("%a %b %d %Y %H:%M:%S")
+                        
+                    if backup_item['_id'] is None:
+                        result = Document.scratch.insert_one(document=backup_item)
+                        if (result['status'] == 'success'):
+                            self.children[item]._id = result['msg']
+                    else:
+                        updated = backup_item
+                        
+                        del updated['_id']
+                        result = Document.scratch.update(_filter={'id': backup_item['_id']}, update=updated)
+                        
+        except:
+            pass
+        
+    def auto_backup(self, interval=18000):
+        while True:
+            try:
+                self.backup()
+                sleep(interval)
+            except:
+                pass
 
 
 if __name__ == '__main__':
