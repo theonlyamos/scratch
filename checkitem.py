@@ -78,7 +78,7 @@ class CheckItem(Frame):
         # self.delete_btn.bind('<Leave>', self.leave)
         # self.delete_btn.bind('<ButtonPress-1>', self.delete)
         
-        delete_icon = self.master.master.icons['trash']
+        delete_icon = self.master.master.icons['trash-can']
         self.delete_btn = Label(
             self, 
             image=delete_icon,

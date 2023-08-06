@@ -112,6 +112,6 @@ class AddMenu(Toplevel):
     
     def show(self):
         self.deiconify()
-        self.wm_protocol('WM_DELETE_WINDOW', self.destroy)
+        self.wm_protocol('WM_DELETE_WINDOW', self.master.toggle_add_menu)
         self.wait_window(self)
         return self.selected

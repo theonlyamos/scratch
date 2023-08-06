@@ -4,12 +4,13 @@ class ToolBar(Frame):
     '''
     Toolbar Frame for all windows
     '''
-    def __init__(self, master=None, add_btn=False, add_btn_command=None, close_btn=True, lock_btn=True, **kw):
+    def __init__(self, master=None, add_btn=False, add_btn_command=None, close_btn=True, lock_btn=True, close_cmd=None, **kw):
         super().__init__(master, **kw)
         self.show_close_btn = close_btn
         self.show_add_btn = add_btn
         self.show_lock_btn = lock_btn
         self.add_btn_command = add_btn_command if add_btn_command else lambda e: e
+        self.close_cmd = close_cmd if close_cmd else self.close_app
         self.content()
     
     def content(self):
@@ -33,7 +34,7 @@ class ToolBar(Frame):
             add_btn.pack(side=LEFT, padx=5)
 
         if self.show_close_btn:
-            close_icon = self.master.icons['circle-close-r'] if self.master.__str__() == '.' else self.master.master.icons['circle-close-r']
+            close_icon = self.master.icons['circle-xmark-r'] if self.master.__str__() == '.' else self.master.master.icons['circle-xmark-r']
             close_btn = Label(
                 self, 
                 image=close_icon,
@@ -44,13 +45,13 @@ class ToolBar(Frame):
 
             close_btn.bind('<Enter>', self.hover)
             close_btn.bind('<Leave>', self.leave)
-            close_btn.bind('<ButtonPress-1>', self.close_app)
+            close_btn.bind('<ButtonPress-1>', self.close_cmd)
             close_btn.pack(side=RIGHT, padx=2, ipadx=3, ipady=3)
         
         if self.show_lock_btn:
             lock_btn = Label(
                 self, 
-                image=self.master.master.icons['lock'] if self.master.locked else self.master.master.icons['unlock'],
+                image=self.master.master.icons['lock'] if self.master.locked else self.master.master.icons['lock-open'],
                 compound='left',
                 name='lock',
                 bg=self['background']
@@ -82,7 +83,7 @@ class ToolBar(Frame):
         '''
         if '.!toolbar.close' in event.widget.__str__():
             #event.widget.configure(bg='crimson')
-            close_icon = self.master.icons['circle-close'] if self.master.__str__() == '.' else self.master.master.icons['circle-close']
+            close_icon = self.master.icons['circle-xmark'] if self.master.__str__() == '.' else self.master.master.icons['circle-xmark']
             event.widget.configure(image=close_icon)
         elif '.!toolbar.add' in event.widget.__str__():
             add_icon = self.master.icons['plus-square'] if self.master.__str__() == '.' else self.master.master.icons['plus-square']
@@ -98,7 +99,7 @@ class ToolBar(Frame):
         '''
         if '.!toolbar.close' in event.widget.__str__():
             #event.widget.configure(bg=self['background'])
-            close_icon = self.master.icons['circle-close-r'] if self.master.__str__() == '.' else self.master.master.icons['circle-close-r']
+            close_icon = self.master.icons['circle-xmark-r'] if self.master.__str__() == '.' else self.master.master.icons['circle-xmark-r']
             event.widget.configure(image=close_icon)
         elif '.!toolbar.add' in event.widget.__str__():
             #event.widget.configure(bg=self['background'])
