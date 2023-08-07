@@ -20,6 +20,7 @@ def speech(text):
     language = "en"
 
     if text.lower().startswith('computer'):
+        text = ' '.join(text.split(" ")[1::])
         if "search youtube" in text.lower() or "on youtube" in text.lower():
             pywhatkit.playonyt(text)
         elif "joke" in text.lower():
