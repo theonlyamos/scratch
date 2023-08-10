@@ -13,12 +13,10 @@ class Settings(Toplevel):
         super().__init__(master, **kw)
         self._id = _id
         self.width = width
-
-        height = master.winfo_height()
         screen_width = master.winfo_screenwidth()
         width = (screen_width - (self.width*2))-10
         
-        self.geometry(f"+%d+0" % width)
+        self.geometry(f"+{width}+0")
         self.minsize(width=self.width, height=200)
         self['background'] = 'black'
         self.overrideredirect(1)
@@ -37,15 +35,25 @@ class Settings(Toplevel):
             lock_btn=False,
             close_cmd=self.master.toggle_settings
         )
+        
+        settings_btn = Label(
+            top_frame,
+            image=self.master.icons['settings'],
+            compound='left',
+            name='settings',
+            bg='grey60'
+        )
+
+        settings_btn.pack(side=LEFT, padx=5, pady=5)
 
         self.title = Label(
             top_frame,
             text='Settings',
-            font='Consolas 14 bold',
+            font='Consolas 12 bold',
             fg='black',
             bg='grey60'
         )
-        self.title.pack(side=LEFT, anchor=W, padx=5, pady=5)
+        self.title.pack(side=LEFT, anchor=W, pady=5)
 
         top_frame.pack(side=TOP, fill=X)
 

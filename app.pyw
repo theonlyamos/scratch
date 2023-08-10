@@ -1,6 +1,7 @@
 __author__ = 'ph4n70m'
 __version__ = '0.0.4'
 
+import sys
 from tkinter import *
 from tkinter import ttk
 from PIL import ImageTk
@@ -12,7 +13,6 @@ from checklist import CheckList
 from addmenu import AddMenu
 from reminder import Reminder
 from settings import Settings
-from speech import speech, get_audio
 
 from runit_database import Document
 from datetime import datetime
@@ -33,19 +33,24 @@ class Scratch(Tk):
     '''
     WIDTH = 250
     HEIGHT = 250
+    CHAT_ON = False
     SHOW_NOTES = True
     MENU_OPEN = False
     SHOW_REMINDERS = True
     SETTINGS_OPEN = False
     SHOW_CHECKLISTS = True
     SPEECH_RECOGNITION = True
+    
+    MOUSE_ENTER_EVENT = '<Enter>'
+    MOUSE_LEAVE_EVENT = '<Leave>'
+    RIGHT_CLICK_EVENT = '<ButtonPress-1>'
 
     def __init__(self, **kw):
         super().__init__(**kw)
  
         screen_width = self.winfo_screenwidth()
-        self.posX = screen_width - Scratch.WIDTH
-        self.geometry(f"+%d+0" % self.posX)
+        self.pos_x = screen_width - Scratch.WIDTH
+        self.geometry(f"+{self.pos_x}+0")
         self.overrideredirect(1)
         self.minsize(width=Scratch.WIDTH, height=40)
         self.attributes('-alpha', 0.7)
@@ -95,9 +100,9 @@ class Scratch(Tk):
         )
 
         settings_btn.pack(side=RIGHT)
-        settings_btn.bind('<Enter>', self.hover)
-        settings_btn.bind('<Leave>', self.leave)
-        settings_btn.bind('<ButtonPress-1>', self.toggle_settings)
+        settings_btn.bind(Scratch.MOUSE_ENTER_EVENT, self.hover)
+        settings_btn.bind(Scratch.MOUSE_LEAVE_EVENT, self.leave)
+        settings_btn.bind(Scratch.RIGHT_CLICK_EVENT, self.toggle_settings)
         
         calendar_btn = Label(
             self.top_frame,
@@ -108,9 +113,9 @@ class Scratch(Tk):
         )
 
         calendar_btn.pack(side=RIGHT, padx=5)
-        calendar_btn.bind('<Enter>', self.hover)
-        calendar_btn.bind('<Leave>', self.leave)
-        calendar_btn.bind('<ButtonPress-1>', lambda e: self.toggle_module(e, 'reminder'))
+        calendar_btn.bind(Scratch.MOUSE_ENTER_EVENT, self.hover)
+        calendar_btn.bind(Scratch.MOUSE_LEAVE_EVENT, self.leave)
+        calendar_btn.bind(Scratch.RIGHT_CLICK_EVENT, lambda e: self.toggle_module(e, 'reminder'))
         
         note_btn = Label(
             self.top_frame,
@@ -120,9 +125,9 @@ class Scratch(Tk):
             name='note',
         )
 
-        note_btn.bind('<Enter>', self.hover)
-        note_btn.bind('<Leave>', self.leave)
-        note_btn.bind('<ButtonPress-1>', lambda e: self.toggle_module(e, 'note'))
+        note_btn.bind(Scratch.MOUSE_ENTER_EVENT, self.hover)
+        note_btn.bind(Scratch.MOUSE_LEAVE_EVENT, self.leave)
+        note_btn.bind(Scratch.RIGHT_CLICK_EVENT, lambda e: self.toggle_module(e, 'note'))
         note_btn.pack(side=RIGHT)
         
         check_btn = Label(
@@ -134,10 +139,10 @@ class Scratch(Tk):
         )
 
         check_btn.pack(side=RIGHT, padx=5)
-        check_btn.bind('<Enter>', self.hover)
-        check_btn.bind('<Leave>', self.leave)
-        check_btn.bind('<ButtonPress-1>', lambda e: self.toggle_module(e, 'checklist'))
-
+        check_btn.bind(Scratch.MOUSE_ENTER_EVENT, self.hover)
+        check_btn.bind(Scratch.MOUSE_LEAVE_EVENT, self.leave)
+        check_btn.bind(Scratch.RIGHT_CLICK_EVENT, lambda e: self.toggle_module(e, 'checklist'))
+        
         speech_btn = Label(
             self.top_frame,
             image=self.icons['mic-solid' if Scratch.SPEECH_RECOGNITION else 'mic'],
@@ -147,27 +152,31 @@ class Scratch(Tk):
         )
 
         speech_btn.pack(side=LEFT)
-        speech_btn.bind('<Enter>', self.hover)
-        speech_btn.bind('<Leave>', self.leave)
-        speech_btn.bind('<ButtonPress-1>', self.toggle_speech_recognition)
+        speech_btn.bind(Scratch.MOUSE_ENTER_EVENT, self.hover)
+        speech_btn.bind(Scratch.MOUSE_LEAVE_EVENT, self.leave)
+        speech_btn.bind(Scratch.RIGHT_CLICK_EVENT, self.toggle_speech_recognition)
 
+        chat_btn = Label(
+            self.top_frame,
+            image=self.icons['android-solid' if Scratch.CHAT_ON else 'android'],
+            compound='left',
+            name='chat',
+            bg='white'
+        )
+
+        chat_btn.pack(side=LEFT)
+        chat_btn.bind(Scratch.MOUSE_ENTER_EVENT, self.hover)
+        chat_btn.bind(Scratch.MOUSE_LEAVE_EVENT, self.leave)
+        chat_btn.bind(Scratch.RIGHT_CLICK_EVENT, self.toggle_speech_recognition)
+        
         self.top_frame.pack(side=TOP, ipady=8, fill=X)
         
         self.add_menu_window = None
         self.settings_window = None
-
-        # Show Loaded Items
-        new_pos = 0
         
         for index, item in enumerate(items):
             item_type = item['type']
             del item['type']
-            
-
-            # if not index:
-            #     item['posY'] = 50
-                
-            # item['posX'] = self.posX
 
             if item_type == 'checklist':
                 CheckList(self, **item)
@@ -182,10 +191,10 @@ class Scratch(Tk):
         speech_thread.daemon = True
 
         self.bind('<FocusOut>', self.save)
-        self.after(100, lambda: speech_thread.start())
+        # self.after(100, lambda: speech_thread.start())
         self.toggle_modules_on_start()
     
-    def get_posY(self)->int:
+    def get_pos_y(self)->int:
         '''
         Calculate next item veritcal positioning
         '''
@@ -196,7 +205,7 @@ class Scratch(Tk):
             return screen_y + 10
         return 48
         
-    def get_posX(self)->int:
+    def get_pos_x(self)->int:
         '''
         Calculate next item veritcal positioning
         '''
@@ -204,31 +213,30 @@ class Scratch(Tk):
 
         screen_y = last_item.winfo_height() + last_item.winfo_y()
         if last_item.winfo_x() == 0:
-            return self.posX
-        if (self.winfo_screenheight() - screen_y) > 200 and last_item.winfo_x() >= self.posX:
-            return self.posX
+            return self.pos_x
+        if (self.winfo_screenheight() - screen_y) > 200 and last_item.winfo_x() >= self.pos_x:
+            return self.pos_x
         
         if (self.winfo_screenheight() - screen_y) > 200:
             return last_item.winfo_x()
 
-        # return (self.winfo_screenwidth() - (last_item.winfo_width()+last_item.winfo_x()))-10
         return (last_item.winfo_x() - self.WIDTH)-10
         
 
-    def new_item(self, event=None, item='note'):
+    def new_item(self, item='note'):
         '''
         Open Toplevel window for creating \n
         new item
         '''
-        posY = self.get_posY()
-        posX = self.get_posX()
+        pos_y = self.get_pos_y()
+        pos_x = self.get_pos_x()
         
         if item == 'note':
             new_note_window = Note(
                 self,
                 width=Scratch.WIDTH,
-                posX=posX,
-                posY=posY
+                pos_x=pos_x,
+                pos_y=pos_y
             )
             self.save()
             new_entry = new_note_window.show()
@@ -238,8 +246,8 @@ class Scratch(Tk):
             checklist_window = CheckList(
                 self,
                 width=Scratch.WIDTH,
-                posX=posX,
-                posY=posY
+                pos_x=pos_x,
+                pos_y=pos_y
             )
             self.save()
             new_checklist = checklist_window.show()
@@ -249,8 +257,8 @@ class Scratch(Tk):
             reminder_window = Reminder(
                 self,
                 width=Scratch.WIDTH,
-                posX=posX,
-                posY=posY
+                pos_x=pos_x,
+                pos_y=pos_y
             )
             self.save()
             new_reminder = reminder_window.show()
@@ -291,7 +299,6 @@ class Scratch(Tk):
         '''
         Toggle Speech Regcognition functionality
         '''
-
         if Scratch.SPEECH_RECOGNITION:
             Scratch.SPEECH_RECOGNITION = False
         else:
@@ -301,18 +308,22 @@ class Scratch(Tk):
         '''
         Start speech recognition
         '''
+        try:
+            from speech import speech, get_audio
 
-        while Scratch.SPEECH_RECOGNITION:
-            try:
-                text = get_audio()
-                speech(text)
-            except Exception as e:
-                print(str(e))
-                pass
+            while True:
+                try:
+                    if Scratch.SPEECH_RECOGNITION:
+                        text = get_audio()
+                        speech(text)
+                except Exception:
+                    pass
+        except Exception:
+            pass
 
     def hover(self, event=None):
         '''
-        Change foreground color on mouse enter
+        Change icon to solid
         '''
 
         if event.widget.__str__() == '.!toolbar.settings':
@@ -342,12 +353,18 @@ class Scratch(Tk):
             else:
                 event.widget.configure(image=self.icons['mic'])
         
+        elif event.widget.__str__() == '.!toolbar.chat':
+            if not Scratch.CHAT_ON:
+                event.widget.configure(image=self.icons['android-solid'])
+            else:
+                event.widget.configure(image=self.icons['android'])
+        
         else:
             event.widget.configure(bg='red')
 
     def leave(self, event=None):
         '''
-        Revert foreground color to default
+        Revert to default icon
         '''
 
         if event.widget.__str__() == '.!toolbar.settings':
@@ -358,7 +375,6 @@ class Scratch(Tk):
                 event.widget.configure(image=self.icons['checkbox-solid'])
             else:
                 event.widget.configure(image=self.icons['checkbox'])
-        
         
         elif event.widget.__str__() == '.!toolbar.calendar':
             if not Scratch.SHOW_REMINDERS:
@@ -377,6 +393,12 @@ class Scratch(Tk):
                 event.widget.configure(image=self.icons['mic'])
             else:
                 event.widget.configure(image=self.icons['mic-solid'])
+        
+        elif event.widget.__str__() == '.!toolbar.chat':
+            if not Scratch.CHAT_ON:
+                event.widget.configure(image=self.icons['android'])
+            else:
+                event.widget.configure(image=self.icons['android-solid'])
 
         else:
             event.widget.configure(bg='white')
@@ -400,7 +422,7 @@ class Scratch(Tk):
 
         self.start_backup_thread()
     
-    def load(self, event=None):
+    def load(self):
         '''
         Load saved items
         '''
@@ -476,7 +498,6 @@ class Scratch(Tk):
         
         @return None
         '''
-        pass
         # items = self.children.copy()
         
         # for item in items.keys():
@@ -484,6 +505,7 @@ class Scratch(Tk):
         #         self.children[item].destroy()
         
         # self.content()
+        pass
     
     def backup(self):
         ''''
@@ -495,7 +517,7 @@ class Scratch(Tk):
             items = self.children.copy()
             
             for item in items:
-                if not '!toolbar' in item and not '!addmenu' in item:
+                if item not in'!toolbar' and item not in '!addmenu':
                     backup_item = self.children[item].to_object()
                     
                     if backup_item['type'] == 'reminder':
@@ -512,7 +534,7 @@ class Scratch(Tk):
                         del updated['_id']
                         result = Document.runnable_db.update(_filter={'id': backup_item['_id']}, update=updated)
                         
-        except:
+        except Exception:
             pass
         
     def auto_backup(self, interval=18000):
@@ -520,7 +542,7 @@ class Scratch(Tk):
             try:
                 self.backup()
                 sleep(interval)
-            except:
+            except Exception:
                 pass
 
 
