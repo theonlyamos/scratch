@@ -1,4 +1,6 @@
-from tkinter import *
+from tkinter import Frame, Label, Entry, Checkbutton, \
+    StringVar, BooleanVar, LEFT, RIGHT, TOP, BOTTOM, \
+    BOTH, X
 from tkinter import ttk
 from colours import COLORS
 import random
@@ -64,19 +66,6 @@ class CheckItem(Frame):
         self.entry.bind('<Return>', self.focus_out)
         self.entry.focus()
         self.entry.pack(side=LEFT, fill=BOTH, expand=True, ipady=5)
-
-        # self.delete_btn = Label(
-        #     self, 
-        #     text='-',
-        #     bg=self.bg,
-        #     fg='white',
-        #     font='Helvetica 20 normal',
-        #     name='delete'
-        # )
-
-        # self.delete_btn.bind('<Enter>', self.hover)
-        # self.delete_btn.bind('<Leave>', self.leave)
-        # self.delete_btn.bind('<ButtonPress-1>', self.delete)
         
         delete_icon = self.master.master.icons['trash-can']
         self.delete_btn = Label(
@@ -87,8 +76,8 @@ class CheckItem(Frame):
             bg='white'
         )
 
-        self.delete_btn.bind('<Enter>', self.hover)
-        self.delete_btn.bind('<Leave>', self.leave)
+        self.delete_btn.bind(self.master.master.MOUSE_ENTER_EVENT, self.hover)
+        self.delete_btn.bind(self.master.master.MOUSE_LEAVE_EVENT, self.leave)
         self.delete_btn.bind('<ButtonPress-1>', self.delete)
         # self.delete_btn.pack(side=RIGHT, padx=5, ipadx=2, ipady=2)
         
@@ -101,12 +90,12 @@ class CheckItem(Frame):
             bg='white'
         )
 
-        self.sublist_btn.bind('<Enter>', self.hover)
-        self.sublist_btn.bind('<Leave>', self.leave)
+        self.sublist_btn.bind(self.master.master.MOUSE_ENTER_EVENT, self.hover)
+        self.sublist_btn.bind(self.master.master.MOUSE_LEAVE_EVENT, self.leave)
         self.sublist_btn.bind('<ButtonPress-1>', self.sublist)
 
-        self.bind('<Enter>', self.show_btns)
-        self.bind('<Leave>', self.hide_btns)
+        self.bind(self.master.master.MOUSE_ENTER_EVENT, self.show_btns)
+        self.bind(self.master.master.MOUSE_LEAVE_EVENT, self.hide_btns)
         
         self.pack(side=TOP, fill=BOTH, expand=True, pady=5, ipady=5)
     
@@ -202,7 +191,7 @@ class CheckItem(Frame):
             item_id = self.__str__()
             toolbar_bg = random.choice(COLORS[17:358]) # if not self.master.is_sublist else self.master.toolbar_bg
     
-            new_list = self.master.create_sublist(self.master.master, title=title, item_id=item_id, toolbar_bg=toolbar_bg)
+            self.master.create_sublist(self.master.master, title=title, item_id=item_id, toolbar_bg=toolbar_bg)
             self.reset(toolbar_bg, 'black', True, 'bold')
     
     def reset(self, bg='black', fg='white', has_sublists = False, font_weight='normal'):

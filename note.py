@@ -1,5 +1,5 @@
-from tkinter import *
-from tkinter import ttk
+from tkinter import Toplevel, Button, Text, \
+    LEFT, TOP, END, BOTH, X, W
 from tkinter.colorchooser import askcolor
 
 from toolbar import ToolBar
@@ -9,19 +9,19 @@ class Note(Toplevel):
     New Note Window
     '''
 
-    def __init__(self, master=None, _id=None, posX=0, posY=0, width=250, text='', bg = '#161a1d', fg = '#fdfffc', locked=False, is_withdrawn=False,  **kw):
+    def __init__(self, master=None, _id=None, pos_x=0, pos_y=0, width=250, text='', bg = '#161a1d', fg = '#fdfffc', locked=False, is_withdrawn=False,  **kw):
         super().__init__(master, **kw)
         self._id = _id
         self.width = width
         self.text = text
         self.bg = bg
         self.fg = fg
-        self.posX = posX
-        self.posY = posY
+        self.pos_x = pos_x
+        self.pos_y = pos_y
         self.locked= locked
         self.is_withdrawn = is_withdrawn
 
-        self.geometry(f"{width}x200+%d+%d" % (posX, posY))
+        self.geometry(f"{width}x200+%d+%d" % (pos_x, pos_y))
 
         self['background'] = '#161a1d'
         self.overrideredirect(1)
@@ -36,8 +36,8 @@ class Note(Toplevel):
         return {
             '_id': self._id,
             'type': 'note',
-            'posX': self.winfo_x(),
-            'posY': self.winfo_y(),
+            'pos_x': self.winfo_x(),
+            'pos_y': self.winfo_y(),
             'width': self.winfo_width(),
             'height': self.winfo_height(),
             'bg': self.bg,

@@ -1,11 +1,13 @@
-from threading import Thread
-from time import sleep
-from tkinter import *
+from tkinter import Toplevel, Label, Entry,  \
+    Frame, LabelFrame, StringVar, IntVar, \
+    LEFT, RIGHT, TOP, X
 from tkinter.ttk import Combobox
 
 from toolbar import ToolBar
 
-from datetime import datetime, timedelta
+from threading import Thread
+from datetime import datetime
+from time import sleep
 
 class Reminder(Toplevel):
     '''
@@ -14,7 +16,8 @@ class Reminder(Toplevel):
     MONTHS = ('January', 'February', 'March', 'April', 'May', 'June',
               'July', 'August', 'September', 'October', 'November', 'December')
 
-    def __init__(self, master=None, _id=None, posX=0, posY=0, title='Title Here', date_time=datetime.utcnow(), width=250, height=120, bg='#161a1d', fg='#fdfffc', locked=False, is_withdrawn=False, **kw):
+    COMBO_SELECTED_EVENT = "<<ComboboxSelected>>"
+    def __init__(self, master=None, _id=None, pos_x=0, pos_y=0, title='Title Here', date_time=datetime.utcnow(), width=250, height=120, bg='#161a1d', fg='#fdfffc', locked=False, is_withdrawn=False, **kw):
         super().__init__(master, **kw)
         self._id = _id
         self.date_time = date_time
@@ -23,13 +26,13 @@ class Reminder(Toplevel):
         self.day = date_time.day
         self.time = date_time.time().isoformat(timespec='seconds')
         self.title = title
-        self.posX = posX
-        self.posY = posY
+        self.pos_x = pos_x
+        self.pos_y = pos_y
         self.locked = locked
         self.is_withdrawn = is_withdrawn
         self.expired = False
         
-        self.geometry(f"{width}x{height}+%d+%d" % (posX, posY))
+        self.geometry(f"{width}x{height}+%d+%d" % (pos_x, pos_y))
 
         #self.minsize(width=width, height=40)
         
@@ -48,8 +51,8 @@ class Reminder(Toplevel):
         return {
             '_id': self._id,
             'type': 'reminder',
-            'posX': self.winfo_x(),
-            'posY': self.winfo_y(),
+            'pos_x': self.winfo_x(),
+            'pos_y': self.winfo_y(),
             'width': self.winfo_width(),
             'height': self.winfo_height(),
             'title': self.title_var.get(),
@@ -87,18 +90,6 @@ class Reminder(Toplevel):
             border=0
         )
         
-        # close_btn = Label(
-        #     tools_frame, 
-        #     text='-',
-        #     bg='black',
-        #     fg='white',
-        #     font='Helvetica 20 normal'
-        # )
-
-
-        # close_btn.bind('<ButtonPress-1>', lambda e: self.destroy())
-        # close_btn.pack(side=LEFT, padx=5, ipadx=5)
-        
         self.title_entry.bind('<Double-1>', self.focus_in)
         self.title_entry.bind('<FocusOut>', self.focus_out)
         self.title_entry.bind('<Return>', self.focus_out)
@@ -135,16 +126,6 @@ class Reminder(Toplevel):
             fg=self.fg
         )
         
-        time_frame = LabelFrame(
-            self,
-            text='Date',
-            bg=self.bg,
-            fg=self.fg
-        )
-        
-        # self.months_var = StringVar()
-        # self.months_var.set('All')
-        
         
         self.year_var = IntVar(value=self.date_time.year)
         yearbox = Combobox (
@@ -177,9 +158,9 @@ class Reminder(Toplevel):
         )
         
         
-        yearbox.bind("<<ComboboxSelected>>", lambda e: self.set_datetime(e))
-        monthbox.bind("<<ComboboxSelected>>", lambda e: self.set_datetime(e))
-        daybox.bind("<<ComboboxSelected>>", lambda e: self.set_datetime(e))
+        yearbox.bind(Reminder.COMBO_SELECTED_EVENT, lambda e: self.set_datetime())
+        monthbox.bind(Reminder.COMBO_SELECTED_EVENT, lambda e: self.set_datetime())
+        daybox.bind(Reminder.COMBO_SELECTED_EVENT, lambda e: self.set_datetime())
         
         yearbox.pack(side=LEFT, pady=2, padx=2)
         monthbox.pack(side=LEFT, pady=2, padx=2)
@@ -208,7 +189,7 @@ class Reminder(Toplevel):
                     self.update_idletasks()
                     on = False if on else True
                 sleep(0.5)
-        except:
+        except Exception:
             pass
     
     def get_days_left(self)->str:
@@ -240,11 +221,11 @@ class Reminder(Toplevel):
                 self.update_idletasks()
                 
                 sleep(60)
-        except:
+        except Exception:
             pass
             
     
-    def set_datetime(self, event=None):
+    def set_datetime(self):
         '''
         Set date_time from combobox
         '''
@@ -267,4 +248,3 @@ class Reminder(Toplevel):
         self.deiconify()
         self.wm_protocol('WM_DELETE_WINDOW', self.destroy)
         self.wait_window(self)
-        # return self.text

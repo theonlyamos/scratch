@@ -1,5 +1,5 @@
-from tkinter import *
-
+from tkinter import Toplevel, Label, Entry,  \
+    StringVar, LEFT, RIGHT, TOP, BOTTOM, X
 from toolbar import ToolBar
 from checkitem import CheckItem
 
@@ -7,11 +7,12 @@ class CheckList(Toplevel):
     '''
     New CheckList Window
     '''
+    OBJECT_NAME = '!checkitem'
 
-    def __init__(self, master=None,_id=None, posX=0, posY=0, title='Title Here', width=250, items:list[dict]=[], text='', bg='#161a1d', fg='#fdfffc', toolbar_bg='#66FFFF', is_sublist=False, parent_item=None, show_checked=True, locked=False, is_withdrawn=False, **kw):
+    def __init__(self, master=None,_id=None, pos_x=0, pos_y=0, title='Title Here', width=250, items: list[dict]=None, text='', bg='#161a1d', fg='#fdfffc', toolbar_bg='#66FFFF', is_sublist=False, parent_item=None, show_checked=True, locked=False, is_withdrawn=False, **kw):
         super().__init__(master, **kw)
         self._id = _id
-        self.items = items
+        self.items = [] if items is None else items
         self.title = title
         self.is_sublist = is_sublist
         self.parent_item = parent_item
@@ -20,10 +21,10 @@ class CheckList(Toplevel):
         self.toolbar_bg = toolbar_bg
         self.is_withdrawn = is_withdrawn
         
-        self.posX = posX
-        self.posY = posY
+        self.pos_x = pos_x
+        self.pos_y = pos_y
         
-        self.geometry(f"+%d+%d" % (posX, posY))
+        self.geometry(f"+{pos_x}+{pos_y}")
         self.minsize(width=width, height=40)
         
         self.bg = bg
@@ -40,14 +41,14 @@ class CheckList(Toplevel):
         '''
         items = []
         for key in self.children.keys():
-            if '!checkitem' in key:
+            if CheckList.OBJECT_NAME in key:
                 items.append(self.children[key].to_object())
                 
         return {
             '_id': self._id,
             'type': 'checklist',
-            'posX': self.winfo_x(),
-            'posY': self.winfo_y(),
+            'pos_x': self.winfo_x(),
+            'pos_y': self.winfo_y(),
             'width': self.winfo_width(),
             'height': self.winfo_height(),
             'title': self.title_var.get(),
@@ -126,15 +127,13 @@ class CheckList(Toplevel):
         if self.show_checked:
             self.show_checked = False
             for item in self.children.values():
-                if '!checkitem' in item.__str__():
-                    if item.check_var.get():
-                        item.pack(side=BOTTOM, fill=X, pady=5)
+                if CheckList.OBJECT_NAME in item.__str__() and item.check_var.get():
+                    item.pack(side=BOTTOM, fill=X, pady=5)
         else:
             self.show_checked = True
             for item in self.children.values():
-                if '!checkitem' in item.__str__():
-                    if item.check_var.get():
-                        item.pack_forget()              
+                if CheckList.OBJECT_NAME in item.__str__() and item.check_var.get():
+                    item.pack_forget()              
     
      
     def add_item(self, event=None):
@@ -167,7 +166,7 @@ class CheckList(Toplevel):
         @param title str Label of checkitem
         @return Type[Classlist]
         '''
-        return cls(master, title=title, toolbar_bg=toolbar_bg, is_sublist=True, parent_item=parent_item, posX = master.get_posX(), posY=master.get_posY())
+        return cls(master, title=title, toolbar_bg=toolbar_bg, is_sublist=True, parent_item=parent_item, pos_x = master.get_pos_x(), pos_y=master.get_pos_y())
 
     def hover(self, event=None):
         '''
@@ -193,4 +192,3 @@ class CheckList(Toplevel):
         self.deiconify()
         self.wm_protocol('WM_DELETE_WINDOW', self.destroy)
         self.wait_window(self)
-        # return self.text

@@ -1,9 +1,12 @@
-from tkinter import *
+from tkinter import Frame, Label, \
+    LEFT, RIGHT
 
 class ToolBar(Frame):
     '''
     Toolbar Frame for all windows
     '''
+    RIGHT_CLICK_EVENT = '<ButtonPress-1>'
+    
     def __init__(self, master=None, add_btn=False, add_btn_command=None, close_btn=True, lock_btn=True, close_cmd=None, **kw):
         super().__init__(master, **kw)
         self.show_close_btn = close_btn
@@ -25,12 +28,13 @@ class ToolBar(Frame):
                 image=add_icon,
                 compound='left',
                 name='add',
-                bg=self['background']
+                bg=self['background'],
+                cursor='hand2'
             )
 
             add_btn.bind('<Enter>', self.hover)
             add_btn.bind('<Leave>', self.leave)
-            add_btn.bind('<ButtonPress-1>', self.add_btn_command)
+            add_btn.bind(self.RIGHT_CLICK_EVENT, self.add_btn_command)
             add_btn.pack(side=LEFT, padx=5)
 
         if self.show_close_btn:
@@ -40,12 +44,13 @@ class ToolBar(Frame):
                 image=close_icon,
                 compound='left',
                 name='close',
-                bg=self['background']
+                bg=self['background'],
+                cursor='hand2'
             )
 
             close_btn.bind('<Enter>', self.hover)
             close_btn.bind('<Leave>', self.leave)
-            close_btn.bind('<ButtonPress-1>', self.close_cmd)
+            close_btn.bind(self.RIGHT_CLICK_EVENT, self.close_cmd)
             close_btn.pack(side=RIGHT, padx=2, ipadx=3, ipady=3)
         
         if self.show_lock_btn:
@@ -54,24 +59,12 @@ class ToolBar(Frame):
                 image=self.master.master.icons['lock'] if self.master.locked else self.master.master.icons['lock-open'],
                 compound='left',
                 name='lock',
-                bg=self['background']
+                bg=self['background'],
+                cursor='hand2'
             )
 
-            lock_btn.bind('<ButtonPress-1>', self.toggle_locked)
+            lock_btn.bind(self.RIGHT_CLICK_EVENT, self.toggle_locked)
             lock_btn.pack(side=RIGHT, padx=2)
-        
-        # minimize_btn = Label(
-        #         self, 
-        #         text='-',
-        #         bg=self['background'],
-        #         fg='white',
-        #         font='Helvetica 20 normal'
-        #     )
-
-        # minimize_btn.bind('<Enter>', self.hover)
-        # minimize_btn.bind('<Leave>', self.leave)
-        # minimize_btn.bind('<ButtonPress-1>', self.close_app)
-        # minimize_btn.pack(side=RIGHT, ipadx=5)
         
         self.bind("<ButtonPress-1>", self.start_move)
         self.bind("<ButtonRelease-1>", self.stop_move)

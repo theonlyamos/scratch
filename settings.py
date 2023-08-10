@@ -1,5 +1,4 @@
-from tkinter import *
-from tkinter import ttk
+from tkinter import Toplevel, Label, LEFT, TOP, W, X
 from tkinter.colorchooser import askcolor
 
 from toolbar import ToolBar

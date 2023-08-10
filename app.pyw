@@ -1,8 +1,8 @@
 __author__ = 'ph4n70m'
 __version__ = '0.0.4'
 
-import sys
-from tkinter import *
+from tkinter import Tk, Label,   \
+    LEFT, RIGHT, TOP, BOTTOM, X
 from tkinter import ttk
 from PIL import ImageTk
 from threading import Thread
@@ -13,6 +13,7 @@ from checklist import CheckList
 from addmenu import AddMenu
 from reminder import Reminder
 from settings import Settings
+from chat import Chat
 
 from runit_database import Document
 from datetime import datetime
@@ -96,7 +97,8 @@ class Scratch(Tk):
             image=self.icons['settings'],
             compound='left',
             name='settings',
-            bg='white'
+            bg='white',
+            cursor='hand2'
         )
 
         settings_btn.pack(side=RIGHT)
@@ -109,7 +111,8 @@ class Scratch(Tk):
             image=self.icons['calendar-solid' if Scratch.SHOW_REMINDERS else 'calendar'],
             text='',
             compound='left',
-            name='calendar'
+            name='calendar',
+            cursor='hand2'
         )
 
         calendar_btn.pack(side=RIGHT, padx=5)
@@ -123,6 +126,7 @@ class Scratch(Tk):
             text='',
             compound='left',
             name='note',
+            cursor='hand2'
         )
 
         note_btn.bind(Scratch.MOUSE_ENTER_EVENT, self.hover)
@@ -135,7 +139,8 @@ class Scratch(Tk):
             image=self.icons['checkbox-solid'if Scratch.SHOW_CHECKLISTS else 'checkbox'],
             text='',
             compound='left',
-            name='check'
+            name='check',
+            cursor='hand2'
         )
 
         check_btn.pack(side=RIGHT, padx=5)
@@ -148,7 +153,8 @@ class Scratch(Tk):
             image=self.icons['mic-solid' if Scratch.SPEECH_RECOGNITION else 'mic'],
             compound='left',
             name='speech',
-            bg='white'
+            bg='white',
+            cursor='hand2'
         )
 
         speech_btn.pack(side=LEFT)
@@ -161,13 +167,14 @@ class Scratch(Tk):
             image=self.icons['android-solid' if Scratch.CHAT_ON else 'android'],
             compound='left',
             name='chat',
-            bg='white'
+            bg='white',
+            cursor='hand2'
         )
 
         chat_btn.pack(side=LEFT)
         chat_btn.bind(Scratch.MOUSE_ENTER_EVENT, self.hover)
         chat_btn.bind(Scratch.MOUSE_LEAVE_EVENT, self.leave)
-        chat_btn.bind(Scratch.RIGHT_CLICK_EVENT, self.toggle_speech_recognition)
+        chat_btn.bind(Scratch.RIGHT_CLICK_EVENT, self.toggle_chat_window)
         
         self.top_frame.pack(side=TOP, ipady=8, fill=X)
         
@@ -193,6 +200,10 @@ class Scratch(Tk):
         self.bind('<FocusOut>', self.save)
         # self.after(100, lambda: speech_thread.start())
         self.toggle_modules_on_start()
+        self.chat_window = Chat(
+            self
+        )
+        self.chat_window.withdraw()
     
     def get_pos_y(self)->int:
         '''
@@ -239,8 +250,7 @@ class Scratch(Tk):
                 pos_y=pos_y
             )
             self.save()
-            new_entry = new_note_window.show()
-            # save_note(new_entry.strip())
+            new_note_window.show()
         
         elif item == 'checklist':
             checklist_window = CheckList(
@@ -250,8 +260,7 @@ class Scratch(Tk):
                 pos_y=pos_y
             )
             self.save()
-            new_checklist = checklist_window.show()
-            # save_note(new_checklist.strip())
+            checklist_window.show()
             
         elif item == 'reminder':
             reminder_window = Reminder(
@@ -261,7 +270,7 @@ class Scratch(Tk):
                 pos_y=pos_y
             )
             self.save()
-            new_reminder = reminder_window.show()
+            reminder_window.show()
     
     def toggle_add_menu(self, event=None):
         '''
@@ -277,9 +286,21 @@ class Scratch(Tk):
                 self
             )
             item = self.add_menu_window.show()
-            Scratch.MENU_OPEN = False
             self.new_item(item=item.strip())
 
+    def toggle_chat_window(self, event=None):
+        '''
+        Show/Hide Add Menu Frame
+        '''
+
+        if Scratch.CHAT_ON:
+            Scratch.CHAT_ON = False
+            self.chat_window.withdraw()
+            # self.chat_window.destroy()
+        else:
+            Scratch.CHAT_ON = True
+            self.chat_window.show()
+            
     def toggle_settings(self, event=None):
         '''
         Show/Hide Add Menu Frame
@@ -293,7 +314,7 @@ class Scratch(Tk):
             self.settings_window = Settings(
                 self
             )
-            item = self.settings_window.show()
+            self.settings_window.show()
 
     def toggle_speech_recognition(self, event=None):
         '''
@@ -325,7 +346,7 @@ class Scratch(Tk):
         '''
         Change icon to solid
         '''
-
+        
         if event.widget.__str__() == '.!toolbar.settings':
             event.widget.configure(image=self.icons['settings-solid'])
         
@@ -358,6 +379,9 @@ class Scratch(Tk):
                 event.widget.configure(image=self.icons['android-solid'])
             else:
                 event.widget.configure(image=self.icons['android'])
+        
+        elif event.widget.__str__() == '.!chat.!frame2.send_chat':
+            event.widget.configure(image=self.icons['paper-plane-solid'])
         
         else:
             event.widget.configure(bg='red')
@@ -399,7 +423,10 @@ class Scratch(Tk):
                 event.widget.configure(image=self.icons['android'])
             else:
                 event.widget.configure(image=self.icons['android-solid'])
-
+        
+        elif event.widget.__str__() == '.!chat.!frame2.send_chat':
+            event.widget.configure(image=self.icons['paper-plane'])
+        
         else:
             event.widget.configure(bg='white')
     
@@ -408,9 +435,9 @@ class Scratch(Tk):
         Save current items
         '''
         items = []
-        excluded = ['!toolbar', '!settings']
+        excluded = ['!toolbar', '!settings', '!chat']
         for item in self.children.keys():
-            if not item in excluded and not '!addmenu' in item:
+            if item not in excluded and '!addmenu' not in item:
                 items.append(self.children[item].to_object())
 
         db = shelve.open('scratch.db')
@@ -491,21 +518,6 @@ class Scratch(Tk):
                 if self.children[item].is_withdrawn:
                     self.children[item].withdraw()
                     self.children[item].is_withdrawn = True
-     
-    def reload(self):
-        '''
-        Rearrange items on item deletion
-        
-        @return None
-        '''
-        # items = self.children.copy()
-        
-        # for item in items.keys():
-        #     if self.children[item]:
-        #         self.children[item].destroy()
-        
-        # self.content()
-        pass
     
     def backup(self):
         ''''
