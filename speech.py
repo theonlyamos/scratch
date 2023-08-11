@@ -9,7 +9,7 @@ def get_audio():
         recorder = sr.Recognizer()
         with sr.Microphone() as source:
             # print("Listening.....")
-            audio = recorder.listen(source, 30, 20)
+            audio = recorder.listen(source, 20, 10)
 
         # print('Recognizing text...')
         text = recorder.recognize_google(audio)

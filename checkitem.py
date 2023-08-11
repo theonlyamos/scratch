@@ -191,7 +191,7 @@ class CheckItem(Frame):
             item_id = self.__str__()
             toolbar_bg = random.choice(COLORS[17:358]) # if not self.master.is_sublist else self.master.toolbar_bg
     
-            self.master.create_sublist(self.master.master, title=title, item_id=item_id, toolbar_bg=toolbar_bg)
+            self.master.create_sublist(self.master.master, title=title, parent_item=item_id, toolbar_bg=toolbar_bg)
             self.reset(toolbar_bg, 'black', True, 'bold')
     
     def reset(self, bg='black', fg='white', has_sublists = False, font_weight='normal'):

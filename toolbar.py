@@ -130,8 +130,8 @@ class ToolBar(Frame):
         if self.master.__str__() != '.' and 'checklist' in self.master.__str__():
             parent = self.master
             if parent.is_sublist:
-                check_item = parent.item_id.split('.')[-1]
-                parent_id = parent.item_id.split('.')[1]
+                check_item = parent.parent_item.split('.')[-1]
+                parent_id = parent.parent_item.split('.')[1]
                 
                 checklist = self.master.master.children[parent_id]
                 checklist.children[check_item].reset()

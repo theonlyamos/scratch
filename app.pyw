@@ -518,7 +518,15 @@ class Scratch(Tk):
                 if self.children[item].is_withdrawn:
                     self.children[item].withdraw()
                     self.children[item].is_withdrawn = True
-    
+
+    def reload(self):
+        '''
+        Rearrange items on item deletion
+        
+        @return None
+        '''
+        pass
+        
     def backup(self):
         ''''
         Backup app to online database
