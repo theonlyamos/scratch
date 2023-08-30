@@ -1,3 +1,4 @@
+.env
 .vs
 .vscode
 /__pycache__
@@ -9,3 +10,4 @@ scratch.db.dir
 scratch.nt
 output.mp3
 *.pyc
+venv/

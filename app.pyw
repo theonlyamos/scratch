@@ -2,7 +2,7 @@ __author__ = 'ph4n70m'
 __version__ = '0.0.4'
 
 from tkinter import Tk, Label,   \
-    LEFT, RIGHT, TOP, BOTTOM, X
+    LEFT, RIGHT, TOP, X
 from tkinter import ttk
 from PIL import ImageTk
 from threading import Thread
@@ -13,6 +13,7 @@ from checklist import CheckList
 from addmenu import AddMenu
 from reminder import Reminder
 from settings import Settings
+from ai import AIAssistant
 from chat import Chat
 
 from runit_database import Document
@@ -22,11 +23,11 @@ import shelve
     
 from icons import icons
 
-Document.initialize(
-    'http://runit.test:9000/api',
-    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4NjkzMDQxNCwianRpIjoiOWU5YmIwMDAtOWJkNS00ZWI4LTg4YWEtYWViMjYzNDU3NGI0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjYyYjAxY2E4ZGVmN2YzMTcwMDNiZWUyYiIsIm5iZiI6MTY4NjkzMDQxNCwiZXhwIjoxNjg5NTIyNDE0fQ.OJq8c4DgBI1haEgbS9NHMDxYAQtaFIzTHSopaiZNeSc',
-    '648c7f6886abacf21d21faf2'
-)
+# Document.initialize(
+#     'http://runit.test:9000/api',
+#     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4NjkzMDQxNCwianRpIjoiOWU5YmIwMDAtOWJkNS00ZWI4LTg4YWEtYWViMjYzNDU3NGI0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjYyYjAxY2E4ZGVmN2YzMTcwMDNiZWUyYiIsIm5iZiI6MTY4NjkzMDQxNCwiZXhwIjoxNjg5NTIyNDE0fQ.OJq8c4DgBI1haEgbS9NHMDxYAQtaFIzTHSopaiZNeSc',
+#     '648c7f6886abacf21d21faf2'
+# )
 
 class Scratch(Tk):
     '''
@@ -198,12 +199,14 @@ class Scratch(Tk):
         speech_thread.daemon = True
 
         self.bind('<FocusOut>', self.save)
-        # self.after(100, lambda: speech_thread.start())
+        self.after(100, lambda: speech_thread.start())
         self.toggle_modules_on_start()
         self.chat_window = Chat(
             self
         )
         self.chat_window.withdraw()
+        
+        self.ai_assistant = AIAssistant()
     
     def get_pos_y(self)->int:
         '''
@@ -329,18 +332,16 @@ class Scratch(Tk):
         '''
         Start speech recognition
         '''
-        try:
-            from speech import speech, get_audio
-
-            while True:
-                try:
-                    if Scratch.SPEECH_RECOGNITION:
-                        text = get_audio()
-                        speech(text)
-                except Exception:
-                    pass
-        except Exception:
-            pass
+        from speech import get_audio
+        while True:
+            try:
+                text = get_audio()
+                if text.lower().startswith('computer'):
+                    text = ' '.join(text.split(" ")[1::])
+                    self.ai_assistant.chat(text)
+            except Exception as e:
+                print(str(e))
+                continue
 
     def hover(self, event=None):
         '''
