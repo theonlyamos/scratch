@@ -2,20 +2,33 @@ from dotenv import load_dotenv
 from langchain.llms import Cohere
 from langchain.chat_models import ChatOpenAI
 from langchain.chains import ConversationChain
-from langchain.agents import Tool
+from langchain.agents import Tool, load_tools
 from langchain.agents import AgentType
 from langchain.utilities import SerpAPIWrapper
 from langchain.agents import initialize_agent
 from langchain.memory import ConversationBufferMemory
+from langchain.prompts import PromptTemplate
 from langchain.prompts.chat import (
-    MessagesPlaceholder,
+    MessagesPlaceholder
 )
+from langchain.tools import (
+    FileSearchTool,
+    ReadFileTool,
+    WriteFileTool,
+    CopyFileTool,
+    DeleteFileTool,
+    ListDirectoryTool,
+    PythonREPLTool
+)
+from langchain.python import PythonREPL
 from ai_tools import (
     InternetBrowser,
     YoutubePlayer,
     FSBrowser,
     AudioOutput
 )
+
+from speech import speak
 
 load_dotenv()
 
@@ -29,11 +42,18 @@ class AIAssistant():
         self.initialize()
     
     def initialize(self):
-        self.llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-0613", max_tokens=1000)
-        # self.llm = Cohere(model="command-nightly", temperature=0)
-
+        # self.llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-0613", max_tokens=1000)
+        self.llm = Cohere(model="command-nightly", temperature=0)
+        
         search = SerpAPIWrapper()
         self.tools = [
+            ReadFileTool(),
+            WriteFileTool(),
+            ListDirectoryTool(),
+            FileSearchTool(),
+            CopyFileTool(),
+            DeleteFileTool(),
+            PythonREPLTool(),
             Tool(
                 name = "Current Search",
                 func=search.run,
@@ -57,7 +77,7 @@ class AIAssistant():
             self.tools, 
             self.llm, 
             agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
-            verbose=False, 
+            verbose=True, 
             memory=self.memory,
             max_iterations=3,
             early_stopping_method='generate',
@@ -67,10 +87,16 @@ class AIAssistant():
             }
         )
     
-    def chat(self, prompt: str):
-        result = self.agent_chain.run(input=prompt)
-        print(result)
-    
+    def chat(self, prompt: str, output_type='stdout'):
+        try:
+            result = self.agent_chain.run(input=prompt)
+            if output_type == 'stdout':
+                return result
+            else:
+                speak(result)
+        except Exception as e:
+            print(str(e))
+            
     def add_tool(self, tool: Tool):
         self.tools.append(tool())
 

@@ -1,9 +1,12 @@
 from threading import Thread
 import speech_recognition as sr
-import pywhatkit
 import pyttsx3
 from pyjokes import get_joke
 import sys
+try:
+    from pywhatkit.misc import playonyt, search
+except Exception:
+    from pywhatkit.misc import playonyt, search
 
 speech_engine = pyttsx3.init()
 
@@ -22,10 +25,10 @@ def speak(text):
 def get_audio():
     recorder = sr.Recognizer()
     with sr.Microphone() as source:
-        print("Listening.....")
+        # print("Listening.....")
         audio = recorder.listen(source)
 
-    print('Recognizing text...')
+    # print('Recognizing text...')
     text = recorder.recognize_google(audio)
     # print('You said:'+text)
     return text
@@ -34,14 +37,14 @@ def speech(text):
     if text.lower().startswith('computer'):
         text = ' '.join(text.split(" ")[1::])
         if "search youtube" in text.lower() or "on youtube" in text.lower():
-            pywhatkit.playonyt(text)
+            playonyt(text)
         elif "joke" in text.lower():
             joke =  get_joke()
             speak_thread = Thread(target=speak, args=(joke,))
             speak_thread.daemon = True
             speak_thread.start()
         else:
-            pywhatkit.search(text)
+            search(text)
 
 def start_recognition():
     while True:

@@ -192,8 +192,23 @@ class Scratch(Tk):
                 Note(self, **item)
             elif item_type == 'reminder':
                 Reminder(self, **item)
+            elif item_type == 'settings':
+                self.settings_window = Settings(
+                    self,
+                    **item
+                )
             else:
                 print('Not a valid type')
+        
+        if (self.settings_window):
+            self.settings_window.withdraw()
+        
+        self.chat_window = Chat(
+            self
+        )
+        self.chat_window.withdraw()
+        
+        self.ai_assistant = AIAssistant()
         
         speech_thread = Thread(target=self.start_speech_recognition)
         speech_thread.daemon = True
@@ -201,12 +216,6 @@ class Scratch(Tk):
         self.bind('<FocusOut>', self.save)
         self.after(100, lambda: speech_thread.start())
         self.toggle_modules_on_start()
-        self.chat_window = Chat(
-            self
-        )
-        self.chat_window.withdraw()
-        
-        self.ai_assistant = AIAssistant()
     
     def get_pos_y(self)->int:
         '''
@@ -236,7 +245,6 @@ class Scratch(Tk):
 
         return (last_item.winfo_x() - self.WIDTH)-10
         
-
     def new_item(self, item='note'):
         '''
         Open Toplevel window for creating \n
@@ -311,12 +319,9 @@ class Scratch(Tk):
 
         if Scratch.SETTINGS_OPEN:
             Scratch.SETTINGS_OPEN = False
-            self.settings_window.destroy()
+            self.settings_window.withdraw()
         else:
             Scratch.SETTINGS_OPEN = True
-            self.settings_window = Settings(
-                self
-            )
             self.settings_window.show()
 
     def toggle_speech_recognition(self, event=None):
@@ -338,7 +343,7 @@ class Scratch(Tk):
                 text = get_audio()
                 if text.lower().startswith('computer'):
                     text = ' '.join(text.split(" ")[1::])
-                    self.ai_assistant.chat(text)
+                    self.ai_assistant.chat(text, 'audio')
             except Exception as e:
                 print(str(e))
                 continue
@@ -353,21 +358,21 @@ class Scratch(Tk):
         
         elif event.widget.__str__() == '.!toolbar.check':
             if not Scratch.SHOW_CHECKLISTS:
-                event.widget.configure(image=self.icons['checkbox'])
-            else:
                 event.widget.configure(image=self.icons['checkbox-solid'])
+            else:
+                event.widget.configure(image=self.icons['checkbox'])
         
         elif event.widget.__str__() == '.!toolbar.note':
             if not Scratch.SHOW_NOTES:
-                event.widget.configure(image=self.icons['document'])
-            else:
                 event.widget.configure(image=self.icons['document-solid'])
+            else:
+                event.widget.configure(image=self.icons['document'])
         
         elif event.widget.__str__() == '.!toolbar.calendar':
             if not Scratch.SHOW_REMINDERS:
-                event.widget.configure(image=self.icons['calendar'])
-            else:
                 event.widget.configure(image=self.icons['calendar-solid'])
+            else:
+                event.widget.configure(image=self.icons['calendar'])
         
         elif event.widget.__str__() == '.!toolbar.speech':
             if not Scratch.SPEECH_RECOGNITION:
@@ -397,21 +402,21 @@ class Scratch(Tk):
 
         elif event.widget.__str__() == '.!toolbar.check':
             if not Scratch.SHOW_CHECKLISTS:
-                event.widget.configure(image=self.icons['checkbox-solid'])
-            else:
                 event.widget.configure(image=self.icons['checkbox'])
+            else:
+                event.widget.configure(image=self.icons['checkbox-solid'])
         
         elif event.widget.__str__() == '.!toolbar.calendar':
             if not Scratch.SHOW_REMINDERS:
-                event.widget.configure(image=self.icons['calendar-solid'])
-            else:
                 event.widget.configure(image=self.icons['calendar'])
+            else:
+                event.widget.configure(image=self.icons['calendar-solid'])
             
         elif event.widget.__str__() == '.!toolbar.note':
             if not Scratch.SHOW_NOTES:
-                event.widget.configure(image=self.icons['document-solid'])
-            else:
                 event.widget.configure(image=self.icons['document'])
+            else:
+                event.widget.configure(image=self.icons['document-solid'])
 
         elif event.widget.__str__() == '.!toolbar.speech':
             if not Scratch.SPEECH_RECOGNITION:
@@ -436,7 +441,8 @@ class Scratch(Tk):
         Save current items
         '''
         items = []
-        excluded = ['!toolbar', '!settings', '!chat']
+        excluded = ['!toolbar', '!chat']
+        
         for item in self.children.keys():
             if item not in excluded and '!addmenu' not in item:
                 items.append(self.children[item].to_object())

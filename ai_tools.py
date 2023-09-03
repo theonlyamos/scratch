@@ -1,8 +1,7 @@
 from langchain.tools import BaseTool
-from pywhatkit import playonyt
 from webbrowser import open_new_tab
+from speech import playonyt, speak
 from typing import Union
-import pyttsx3
 import os
 
 NotImplementedErrorMessage = 'this tool does not suport async'
@@ -29,11 +28,7 @@ class AudioOutput(BaseTool):
     name = "Speak"
     description = "use this tool when you need to tell me something"
     def _run(self, text: str):
-        speech_engine = pyttsx3.init()
-        speech_engine.say(text)
-        speech_engine.runAndWait()
-        
-        return True
+        return speak(text)
     
     def _arun(self, text: str):
         raise NotImplementedError(NotImplementedErrorMessage)

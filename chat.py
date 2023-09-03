@@ -1,7 +1,8 @@
-from tkinter import Toplevel, Label, Frame, \
-    Text, Scrollbar, LEFT, TOP, BOTH, W, X, Y, \
+from tkinter import (
+    Toplevel, Label, Frame, Text, Canvas,
+    Scrollbar, LEFT, TOP, BOTH, W, X, Y,
     RIGHT, BOTTOM
-from tkinter.colorchooser import askcolor
+)
 
 from toolbar import ToolBar
 
@@ -65,7 +66,8 @@ class Chat(Toplevel):
         
         self.chat_container = Frame(
             main_container,
-            bg="black"
+            bg="black",
+            height=10
         )
         
         self.chat_container.pack(side=LEFT, fill=BOTH, expand=True, ipady=5)
@@ -121,6 +123,7 @@ class Chat(Toplevel):
         Get text from prompt entry
         '''
         prompt = self.prompt_entry.get('1.0', 'end')
+        
         prompt_label = Label(
             self.chat_container,
             text=prompt,
@@ -134,6 +137,21 @@ class Chat(Toplevel):
         )
         prompt_label.pack(side=TOP, anchor='se', pady=10, padx=10)
         self.prompt_entry.delete('1.0', 'end')
+        self.update_idletasks()
+        
+        result = self.master.ai_assistant.chat(prompt)
+        ai_label = Label(
+            self.chat_container,
+            text=result,
+            bg='grey10',
+            fg='white',
+            font=('Lucida Console', 8, 'normal'),
+            justify='left',
+            wraplength=280,
+            padx=5,
+            pady=5
+        )
+        ai_label.pack(side=TOP, anchor='sw', pady=10, padx=10)
 
     def show(self):
         self.deiconify()
