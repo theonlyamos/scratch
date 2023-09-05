@@ -5,6 +5,7 @@ from checkitem import CheckItem
 
 class CheckList(Toplevel):
     '''
+    
     New CheckList Window
     '''
     OBJECT_NAME = '!checkitem'

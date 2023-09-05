@@ -8,6 +8,7 @@ from langchain.utilities import SerpAPIWrapper
 from langchain.agents import initialize_agent
 from langchain.memory import ConversationBufferMemory
 from langchain.prompts import PromptTemplate
+from langchain.utilities import TextRequestsWrapper
 from langchain.prompts.chat import (
     MessagesPlaceholder
 )
@@ -18,7 +19,8 @@ from langchain.tools import (
     CopyFileTool,
     DeleteFileTool,
     ListDirectoryTool,
-    PythonREPLTool
+    PythonREPLTool,
+    RequestsGetTool
 )
 from langchain.python import PythonREPL
 from ai_tools import (
@@ -46,6 +48,10 @@ class AIAssistant():
         self.llm = Cohere(model="command-nightly", temperature=0)
         
         search = SerpAPIWrapper()
+        requests = load_tools(
+            ['requests_all'],
+            llm=self.llm
+        )
         self.tools = [
             ReadFileTool(),
             WriteFileTool(),
@@ -55,14 +61,14 @@ class AIAssistant():
             DeleteFileTool(),
             PythonREPLTool(),
             Tool(
+                name="Requests",
+                func=requests[0],
+                description="useful for getting website content or making api requests"
+            ),
+            Tool(
                 name = "Current Search",
                 func=search.run,
                 description="useful for when you need to answer questions about current events or the current state of the world"
-            ),
-            Tool(
-                name = "Youtube Search",
-                func=search.run,
-                description="useful for when you want to search on youtube"
             ),
             YoutubePlayer(),
             InternetBrowser(),

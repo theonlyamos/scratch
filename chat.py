@@ -1,10 +1,12 @@
 from tkinter import (
     Toplevel, Label, Frame, Text, Canvas,
     Scrollbar, LEFT, TOP, BOTH, W, X, Y,
-    RIGHT, BOTTOM
+    RIGHT, BOTTOM, NW
 )
 
 from toolbar import ToolBar
+
+FONT_LUCIDA_CONSOLE = 'Lucida Console'
 
 class Chat(Toplevel):
     '''
@@ -62,22 +64,39 @@ class Chat(Toplevel):
         
         main_container = Frame(
             self,
+            bg='black'
         )
-        
-        self.chat_container = Frame(
-            main_container,
-            bg="black",
-            height=10
-        )
-        
-        self.chat_container.pack(side=LEFT, fill=BOTH, expand=True, ipady=5)
         
         left_scroll = Scrollbar(
-            self.chat_container,
+            main_container,
             background='grey10',
         )
         
         left_scroll.pack(side=RIGHT, fill=Y)
+        
+        self.canvas = Canvas(
+            main_container, 
+            background='black',
+            yscrollcommand=left_scroll.set
+        )
+        
+        self.chat_container = Frame(
+            self.canvas,
+            bg="black",
+            height=10
+        )
+        
+        self.canvas.pack(side=LEFT, fill=BOTH)
+        left_scroll.config(command=self.canvas.yview)
+        self.chat_container.bind('<Configure>', self._configure_chat_frame)
+        self.canvas.bind('<Configure>', self._configure_canvas)
+        self.canvas.bind('<MouseWheel>', lambda event: self.canvas.yview_scroll(-int(event.delta/60), 'units'))
+        self.chat_frame_id = self.canvas.create_window(
+            0, 
+            0, 
+            window=self.chat_container,
+            anchor=NW
+        )
         
         main_container.pack(side=TOP, fill=BOTH, expand=True)
         
@@ -91,7 +110,7 @@ class Chat(Toplevel):
             background='black', 
             highlightthickness=0,
             fg='white', 
-            font=('Lucida Console', 10, 'normal'),
+            font=(FONT_LUCIDA_CONSOLE, 10, 'normal'),
             height=3,
             width=36, 
             borderwidth=0,
@@ -118,6 +137,20 @@ class Chat(Toplevel):
         
         chat_frame.pack(side=BOTTOM, fill=BOTH)
     
+    def update_canvas(self):
+        self.update_idletasks()
+        self.canvas.yview_moveto(1.0)
+
+    def _configure_chat_frame(self, event):
+        size = (self.chat_container.winfo_reqwidth(), self.chat_container.winfo_reqheight())
+        self.canvas.config(scrollregion=(0, 0, size[0], size[1]))
+        # if self.chat_container.winfo_reqwidth != self.canvas.winfo_width():
+        #     self.canvas.config(width=self.chat_container.winfo_reqwidth())
+    
+    def _configure_canvas(self, event):
+        if self.chat_container.winfo_reqwidth != self.canvas.winfo_width():
+            self.canvas.itemconfigure(self.chat_frame_id, width=self.canvas.winfo_width())
+    
     def get_prompt(self, event=None):
         '''
         Get text from prompt entry
@@ -129,7 +162,7 @@ class Chat(Toplevel):
             text=prompt,
             bg='grey10',
             fg='white',
-            font=('Lucida Console', 8, 'normal'),
+            font=(FONT_LUCIDA_CONSOLE, 8, 'normal'),
             justify='left',
             wraplength=280,
             padx=5,
@@ -137,7 +170,8 @@ class Chat(Toplevel):
         )
         prompt_label.pack(side=TOP, anchor='se', pady=10, padx=10)
         self.prompt_entry.delete('1.0', 'end')
-        self.update_idletasks()
+        # self.update_idletasks()
+        self.update_canvas()
         
         result = self.master.ai_assistant.chat(prompt)
         ai_label = Label(
@@ -145,13 +179,14 @@ class Chat(Toplevel):
             text=result,
             bg='grey10',
             fg='white',
-            font=('Lucida Console', 8, 'normal'),
+            font=(FONT_LUCIDA_CONSOLE, 8, 'normal'),
             justify='left',
             wraplength=280,
             padx=5,
             pady=5
         )
         ai_label.pack(side=TOP, anchor='sw', pady=10, padx=10)
+        self.update_canvas()
 
     def show(self):
         self.deiconify()
