@@ -19,15 +19,19 @@ from langchain.tools import (
     CopyFileTool,
     DeleteFileTool,
     ListDirectoryTool,
-    PythonREPLTool,
-    RequestsGetTool
+    PythonAstREPLTool
 )
-from langchain.python import PythonREPL
 from ai_tools import (
     InternetBrowser,
     YoutubePlayer,
     FSBrowser,
-    AudioOutput
+    AudioOutput,
+    WorldNews
+)
+from llms import (
+    TogetherLLM,
+    ClarifaiClaudeInstant,
+    ClarifaiLlama2
 )
 
 from speech import speak
@@ -46,6 +50,8 @@ class AIAssistant():
     def initialize(self):
         # self.llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-0613", max_tokens=1000)
         self.llm = Cohere(model="command-nightly", temperature=0)
+        # self.llm = TogetherLLM(model="togethercomputer/llama-2-70b-chat", temperature=0.0)
+        # self.llm = ClarifaiLlama2()
         
         search = SerpAPIWrapper()
         requests = load_tools(
@@ -59,7 +65,7 @@ class AIAssistant():
             FileSearchTool(),
             CopyFileTool(),
             DeleteFileTool(),
-            PythonREPLTool(),
+            PythonAstREPLTool(),
             Tool(
                 name="Requests",
                 func=requests[0],
@@ -73,7 +79,8 @@ class AIAssistant():
             YoutubePlayer(),
             InternetBrowser(),
             FSBrowser(),
-            AudioOutput()
+            AudioOutput(),
+            WorldNews()
         ]
         
         self.chat_history = MessagesPlaceholder(variable_name="chat_history")
@@ -105,6 +112,3 @@ class AIAssistant():
             
     def add_tool(self, tool: Tool):
         self.tools.append(tool())
-
-if __name__ == "__main__":
-    assistant = AIAssistant()

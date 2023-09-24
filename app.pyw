@@ -7,6 +7,7 @@ from tkinter import ttk
 from PIL import ImageTk
 from threading import Thread
 
+from utils import get_audio
 from toolbar import ToolBar
 from note import Note
 from checklist import CheckList
@@ -182,7 +183,9 @@ class Scratch(Tk):
         self.add_menu_window = None
         self.settings_window = None
         
-        for index, item in enumerate(items):
+        ai_settings = {}
+        
+        for item in items:
             item_type = item['type']
             del item['type']
 
@@ -193,15 +196,16 @@ class Scratch(Tk):
             elif item_type == 'reminder':
                 Reminder(self, **item)
             elif item_type == 'settings':
-                self.settings_window = Settings(
-                    self,
-                    **item
-                )
+                ai_settings = item
             else:
                 print('Not a valid type')
+    
+        self.settings_window = Settings(
+            self,
+            **ai_settings
+        )
         
-        if (self.settings_window):
-            self.settings_window.withdraw()
+        self.settings_window.withdraw()
         
         self.chat_window = Chat(
             self
@@ -337,7 +341,7 @@ class Scratch(Tk):
         '''
         Start speech recognition
         '''
-        from speech import get_audio
+        
         while True:
             try:
                 text = get_audio()
@@ -355,6 +359,9 @@ class Scratch(Tk):
         
         if event.widget.__str__() == '.!toolbar.settings':
             event.widget.configure(image=self.icons['settings-solid'])
+        
+        elif event.widget.__str__() == '.!chat.!toolbar.clear':
+            event.widget.configure(image=self.icons['clear-solid'])
         
         elif event.widget.__str__() == '.!toolbar.check':
             if not Scratch.SHOW_CHECKLISTS:
@@ -396,9 +403,12 @@ class Scratch(Tk):
         '''
         Revert to default icon
         '''
-
+        
         if event.widget.__str__() == '.!toolbar.settings':
             event.widget.configure(image=self.icons['settings'])
+        
+        elif event.widget.__str__() == '.!chat.!toolbar.clear':
+            event.widget.configure(image=self.icons['clear'])
 
         elif event.widget.__str__() == '.!toolbar.check':
             if not Scratch.SHOW_CHECKLISTS:

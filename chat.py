@@ -3,7 +3,7 @@ from tkinter import (
     Scrollbar, LEFT, TOP, BOTH, W, X, Y,
     RIGHT, BOTTOM, NW
 )
-
+from threading import Thread
 from toolbar import ToolBar
 
 FONT_LUCIDA_CONSOLE = 'Lucida Console'
@@ -21,7 +21,7 @@ class Chat(Toplevel):
         width = (screen_width - (self.width*2))+90
         
         self.geometry(f"+{width}+0")
-        self.minsize(width=self.width, height=400)
+        self.minsize(width=self.width, height=500)
         self.maxsize(width=self.width, height=650)
         self['background'] = 'black'
         self.overrideredirect(1)
@@ -59,6 +59,20 @@ class Chat(Toplevel):
             bg='grey60'
         )
         self.title.pack(side=LEFT, anchor=W, pady=5)
+        
+        clear_btn = Label(
+            top_frame,
+            image=self.master.icons['clear'],
+            compound='left',
+            name='clear',
+            bg='grey60',
+            cursor='hand2'
+        )
+
+        clear_btn.bind(self.master.MOUSE_ENTER_EVENT, self.master.hover)
+        clear_btn.bind(self.master.MOUSE_LEAVE_EVENT, self.master.leave)
+        clear_btn.bind(self.master.RIGHT_CLICK_EVENT, self.clear_chat)
+        clear_btn.pack(side=RIGHT, pady=5)
 
         top_frame.pack(side=TOP, fill=X)
         
@@ -111,14 +125,14 @@ class Chat(Toplevel):
             highlightthickness=0,
             fg='white', 
             font=(FONT_LUCIDA_CONSOLE, 10, 'normal'),
-            height=3,
+            height=2,
             width=36, 
             borderwidth=0,
             padx=5,
             pady=5
         )
         
-        self.prompt_entry.bind("<Control-Return>", self.get_prompt)
+        self.prompt_entry.bind("<Return>", self.get_prompt)
         self.prompt_entry.pack(side=LEFT, fill=X, expand=False, padx=5, pady=5)
         
         send_btn = Label(
@@ -155,7 +169,7 @@ class Chat(Toplevel):
         '''
         Get text from prompt entry
         '''
-        prompt = self.prompt_entry.get('1.0', 'end')
+        prompt = self.prompt_entry.get('1.0', 'end').strip()
         
         prompt_label = Label(
             self.chat_container,
@@ -173,6 +187,12 @@ class Chat(Toplevel):
         # self.update_idletasks()
         self.update_canvas()
         
+        chat_thread = Thread(target=self.query_chat, args=(prompt,))
+        chat_thread.daemon = True
+        chat_thread.start()
+        
+    
+    def query_chat(self, prompt):
         result = self.master.ai_assistant.chat(prompt)
         ai_label = Label(
             self.chat_container,
@@ -187,7 +207,16 @@ class Chat(Toplevel):
         )
         ai_label.pack(side=TOP, anchor='sw', pady=10, padx=10)
         self.update_canvas()
-
+    
+    def clear_chat(self, event=None):
+        """Clear memory buffery and chat history"""
+        
+        for item in self.chat_container.winfo_children():
+            item.destroy()
+        
+        self.master.ai_assistant.memory.clear()
+        self.update_canvas()
+        
     def show(self):
         self.deiconify()
         self.wm_protocol('WM_DELETE_WINDOW', self.master.toggle_chat_window)

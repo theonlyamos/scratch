@@ -20,12 +20,14 @@ class Settings(Toplevel):
         openai_api_key='',
         cohere_api_key='',
         serpapi_api_key='',
+        newsapi_api_key='',
         **kw):
         super().__init__(master, **kw)
         self._id = _id
         self.openai_api_key = StringVar(value=openai_api_key),
         self.cohere_api_key = StringVar(value=cohere_api_key),
         self.serpapi_api_key = StringVar(value=serpapi_api_key),
+        self.newsapi_api_key = StringVar(value=newsapi_api_key),
         self.width = width
         screen_width = master.winfo_screenwidth()
         width = (screen_width - (self.width*2))-10
@@ -48,7 +50,8 @@ class Settings(Toplevel):
             'type': 'settings',
             "openai_api_key": self.openai_api_key[0].get(),
             "cohere_api_key": self.cohere_api_key[0].get(),
-            "serpapi_api_key": self.serpapi_api_key[0].get()
+            "serpapi_api_key": self.serpapi_api_key[0].get(),
+            "newsapi_api_key": self.newsapi_api_key[0].get()
         }
         
     def content(self):
@@ -139,12 +142,30 @@ class Settings(Toplevel):
             show="*"
         )
         
+        newsapi_api_label = Label(
+            ai_settings_frame,
+            text="SERP API KEY",
+            fg="white",
+            bg='black',
+            justify=LEFT
+        )
+        
+        newsapi_api_entry = Entry(
+            ai_settings_frame,
+            textvariable=self.newsapi_api_key,
+            fg="white",
+            bg="black",
+            show="*"
+        )
+        
         openai_api_label.pack(side=TOP, padx=5)
         openai_api_entry.pack(side=TOP, fill=X, padx=5, pady=5, ipadx=5, ipady=5)
         cohere_api_label.pack(side=TOP, padx=5,)
         cohere_api_entry.pack(side=TOP, fill=X, padx=5, pady=5, ipadx=5, ipady=5)
         serpapi_api_label.pack(side=TOP, padx=5)
         serpapi_api_entry.pack(side=TOP, fill=X, padx=5, pady=5, ipadx=5, ipady=5)
+        newsapi_api_label.pack(side=TOP, padx=5)
+        newsapi_api_entry.pack(side=TOP, fill=X, padx=5, pady=5, ipadx=5, ipady=5)
         
         ai_settings_frame.pack(side=TOP, fill=X, padx=5, pady=5, ipadx=5, ipady=5)
         

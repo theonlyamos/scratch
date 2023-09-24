@@ -1,7 +1,9 @@
 from langchain.tools import BaseTool
 from webbrowser import open_new_tab
-from speech import playonyt, speak
 from typing import Union, Optional
+from webbrowser import open_new_tab
+from utils import speak
+import requests
 import os
 
 NotImplementedErrorMessage = 'this tool does not suport async'
@@ -10,14 +12,30 @@ class YoutubePlayer(BaseTool):
     name = "Youtube Player"
     description = "use this tool when you need to play a youtube video"
     
-    def _run(self, url: str):
-        return playonyt(url)
+    def _run(self, topic: str):
+        """Play a YouTube Video"""
+
+        url = f"https://www.youtube.com/results?q={topic}"
+        count = 0
+        cont = requests.get(url)
+        data = cont.content
+        data = str(data)
+        lst = data.split('"')
+        for i in lst:
+            count += 1
+            if i == "WEB_PAGE_TYPE_WATCH":
+                break
+        if lst[count - 5] == "/results":
+            raise Exception("No Video Found for this Topic!")
+
+        open_new_tab(f"https://www.youtube.com{lst[count - 5]}")
+        return f"https://www.youtube.com{lst[count - 5]}"
     
     def _arun(self, url: str):
         raise NotImplementedError(NotImplementedErrorMessage)
 
 class InternetBrowser(BaseTool):
-    name = "Internet Browsser"
+    name = "Internet Browser"
     description = "use this tool when you need to visit a website"
     def _run(self, url: str):
         return open_new_tab(url)
@@ -34,8 +52,71 @@ class AudioOutput(BaseTool):
     def _arun(self, text: str):
         raise NotImplementedError(NotImplementedErrorMessage)
 
+class WorldNews(BaseTool):
+    name = "World News"
+    categories = ["business","entertainment","general",
+                  "health","science","sports","technology"]
+    description = f"""
+    Use this tool to fetch current news headlines.
+    Only titles of the news should be presented to
+    the user.
+    
+    Allowed categories are: {categories}
+    The parameters for the news should be intuited
+    from the user's query.
+    
+    Always convert the country to its 2-letter ISO 3166-1 code
+    if the country parameter is needed before being used.
+    
+    Never use 'world' as a country.
+    
+    The results of this tool should alwasy be returned
+    to the user as bullet points.
+    
+    :param topic (optional): The topic to search for
+    :param category (optional): Category selected from categories
+    :param country (optional): Country to search news from
+    """
+    def _run(self, topic: str = None, category: str = None, country: str = None):
+        try:
+            url = "https://newsapi.org/v2/top-headlines"
+            params={
+                "apiKey": os.getenv('NEWSAPI_API_KEY'),
+                "language": "en",
+                "sources": "bbc-news,the-verge,google-news",
+                "pageSize": 5
+            }
+            
+            if topic:
+                params["q"] = topic
+            
+            if any([category, country]) and category != 'general' and country not in ('world',''):
+                del params['sources']
+            
+                if category:
+                    params["category"] = category
+            
+                if country:
+                    params["country"] = country
+            
+            response = requests.get(
+                url,
+                params=params
+            )
+            
+            results = response.json()
+            articles = results['articles']
+            headlines = [line['title'] for line in articles]
+            
+            return headlines
+        except Exception as e:
+            return f"Error: {str(e)}"
+    
+    def _arun(self, url: str):
+        raise NotImplementedError(NotImplementedErrorMessage)
+
 class FSBrowser(BaseTool):
-    name = "File System Browsser"
+    name = "File System Browser"
     description = f"""use this tool when you need to perform
     file system operations like listing of directories,
     opening a file, creating a file, updating a file,
