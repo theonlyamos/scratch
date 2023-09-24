@@ -165,11 +165,14 @@ class Chat(Toplevel):
         if self.chat_container.winfo_reqwidth != self.canvas.winfo_width():
             self.canvas.itemconfigure(self.chat_frame_id, width=self.canvas.winfo_width())
     
-    def get_prompt(self, event=None):
+    def get_prompt(self, event=None, reply_type='stdout'):
         '''
         Get text from prompt entry
         '''
-        prompt = self.prompt_entry.get('1.0', 'end').strip()
+        if type(event) is str:
+            prompt = event
+        else:
+            prompt = self.prompt_entry.get('1.0', 'end').strip()
         
         prompt_label = Label(
             self.chat_container,
@@ -187,13 +190,13 @@ class Chat(Toplevel):
         # self.update_idletasks()
         self.update_canvas()
         
-        chat_thread = Thread(target=self.query_chat, args=(prompt,))
+        chat_thread = Thread(target=self.query_chat, args=(prompt,reply_type,))
         chat_thread.daemon = True
         chat_thread.start()
         
     
-    def query_chat(self, prompt):
-        result = self.master.ai_assistant.chat(prompt)
+    def query_chat(self, prompt: str, reply_type=None):
+        result = self.master.ai_assistant.chat(prompt, reply_type)
         ai_label = Label(
             self.chat_container,
             text=result,

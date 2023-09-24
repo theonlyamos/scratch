@@ -42,7 +42,7 @@ class Scratch(Tk):
     SHOW_REMINDERS = True
     SETTINGS_OPEN = False
     SHOW_CHECKLISTS = True
-    SPEECH_RECOGNITION = True
+    SPEECH_RECOGNITION = False
     
     MOUSE_ENTER_EVENT = '<Enter>'
     MOUSE_LEAVE_EVENT = '<Leave>'
@@ -341,13 +341,18 @@ class Scratch(Tk):
         '''
         Start speech recognition
         '''
-        
+        commands = ["computer start", "computer stop"]
         while True:
             try:
                 text = get_audio()
-                if text.lower().startswith('computer'):
-                    text = ' '.join(text.split(" ")[1::])
-                    self.ai_assistant.chat(text, 'audio')
+                if text:
+                    if text.lower().startswith(commands[0]) and not Scratch.SPEECH_RECOGNITION:
+                        Scratch.SPEECH_RECOGNITION = True
+                    elif text.lower().startswith(commands[1]):
+                        Scratch.SPEECH_RECOGNITION = False
+                    
+                    if Scratch.SPEECH_RECOGNITION and not text.lower().startswith(commands[0]):
+                        self.chat_window.get_prompt(text, 'audio')
             except Exception as e:
                 print(str(e))
                 continue

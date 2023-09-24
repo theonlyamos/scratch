@@ -168,5 +168,5 @@ if __name__ == "__main__":
         text = input("Enter query>> ")
         if text == 'exit':
             break
-        response = assistant(get_prompt(text))
+        response = assistant(text)
         print(response )

@@ -31,9 +31,10 @@ from ai_tools import (
 from llms import (
     TogetherLLM,
     ClarifaiClaudeInstant,
-    ClarifaiLlama2
+    ClarifaiLlama2,
+    Coral
 )
-
+from threading import Thread
 from speech import speak
 
 load_dotenv()
@@ -49,9 +50,10 @@ class AIAssistant():
     
     def initialize(self):
         # self.llm = ChatOpenAI(temperature=0, model="gpt-3.5-turbo-0613", max_tokens=1000)
-        self.llm = Cohere(model="command-nightly", temperature=0)
+        # self.llm = Cohere(model="command-nightly", temperature=0)
         # self.llm = TogetherLLM(model="togethercomputer/llama-2-70b-chat", temperature=0.0)
         # self.llm = ClarifaiLlama2()
+        self.llm = Coral(model="command-nightly", temperature=0.0)
         
         search = SerpAPIWrapper()
         requests = load_tools(
@@ -90,7 +92,7 @@ class AIAssistant():
             self.tools, 
             self.llm, 
             agent=AgentType.STRUCTURED_CHAT_ZERO_SHOT_REACT_DESCRIPTION, 
-            verbose=True, 
+            verbose=False, 
             memory=self.memory,
             max_iterations=3,
             early_stopping_method='generate',
@@ -103,10 +105,12 @@ class AIAssistant():
     def chat(self, prompt: str, output_type='stdout'):
         try:
             result = self.agent_chain.run(input=prompt)
-            if output_type == 'stdout':
-                return result
-            else:
-                speak(result)
+            if output_type == 'audio':
+                speak_thread = Thread(target=speak, args=(result,))
+                speak_thread.daemon = True
+                speak_thread.start()
+            return result
+                
         except Exception as e:
             print(str(e))
             
