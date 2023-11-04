@@ -16,21 +16,28 @@ def backup():
         
         if 'items' in db.keys():
             items = db['items']
+        
+        excluded = ['!toolbar', '!addmenu', '!chat']
         if len(items):
             for item in items:
-                if item['type'] == 'reminder':
-                    dt = item['date_time']
-                    item['date_time'] = dt.strftime("%a %b %d %Y %H:%M:%S")
-                    
-                if item['_id'] is None:
-                    result = Document.scratch.insert_one(document=item)
-                    if (result['status'] == 'success'):
-                        item['_id'] = result['msg']
-                else:
-                    updated = item
-                    
-                    del updated['_id']
-                    result = Document.scratch.update(_filter={'id': item['_id']}, update=updated)
+                if item not in excluded:
+                    try:
+
+                        if item['type'] == 'reminder':
+                            dt = item['date_time']
+                            item['date_time'] = dt.strftime("%a %b %d %Y %H:%M:%S")
+                            
+                        if item['_id'] is None:
+                            result = Document.runnable_db.insert_one(document=item)
+                            if (result['status'] == 'success'):
+                                item['_id'] = result['msg']
+                        else:
+                            updated = item
+                            del updated['_id']
+                            result = Document.runnable_db.update(_filter={'id': item['_id']}, update=updated)
+                                
+                    except Exception:
+                        continue
                 
                 if item['type'] == 'reminder':
                     item['date_time'] = dt
@@ -39,7 +46,7 @@ def backup():
             db.close()
     except:
         pass
-        
+    
 def auto_backup(interval=18000):
     while True:
         try:

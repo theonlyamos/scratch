@@ -24,11 +24,11 @@ import shelve
     
 from icons import icons
 
-# Document.initialize(
-#     'http://runit.test:9000/api',
-#     'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY4NjkzMDQxNCwianRpIjoiOWU5YmIwMDAtOWJkNS00ZWI4LTg4YWEtYWViMjYzNDU3NGI0IiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjYyYjAxY2E4ZGVmN2YzMTcwMDNiZWUyYiIsIm5iZiI6MTY4NjkzMDQxNCwiZXhwIjoxNjg5NTIyNDE0fQ.OJq8c4DgBI1haEgbS9NHMDxYAQtaFIzTHSopaiZNeSc',
-#     '648c7f6886abacf21d21faf2'
-# )
+Document.initialize(
+    'https://runit.fly.dev/api',
+    'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5NTk4NDUxNywianRpIjoiNDI3MzQzMDEtOGY5Zi00MDA4LThmZGItODRmZDA0NWQ5MmVlIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6IjYyYjAxY2E4ZGVmN2YzMTcwMDNiZWUyYiIsIm5iZiI6MTY5NTk4NDUxNywiZXhwIjoxNjk4NTc2NTE3fQ.1s1xypocfg7EovpMEzw3w22r6MKU-Khj4FVkEfjcb1Q',
+    '648c7f6886abacf21d21faf2'
+)
 
 class Scratch(Tk):
     '''
@@ -42,7 +42,9 @@ class Scratch(Tk):
     SHOW_REMINDERS = True
     SETTINGS_OPEN = False
     SHOW_CHECKLISTS = True
-    SPEECH_RECOGNITION = False
+    DB_DIR = 'db/scratch.db'
+    SPEECH_RECOGNITION = True
+    START_SPEECH_RECOGNITION = False
     
     MOUSE_ENTER_EVENT = '<Enter>'
     MOUSE_LEAVE_EVENT = '<Leave>'
@@ -344,15 +346,17 @@ class Scratch(Tk):
         commands = ["computer start", "computer stop"]
         while True:
             try:
-                text = get_audio()
-                if text:
-                    if text.lower().startswith(commands[0]) and not Scratch.SPEECH_RECOGNITION:
-                        Scratch.SPEECH_RECOGNITION = True
-                    elif text.lower().startswith(commands[1]):
-                        Scratch.SPEECH_RECOGNITION = False
-                    
-                    if Scratch.SPEECH_RECOGNITION and not text.lower().startswith(commands[0]):
-                        self.chat_window.get_prompt(text, 'audio')
+                if Scratch.SPEECH_RECOGNITION:
+                    text = get_audio()
+                    print(text)
+                    if text:
+                        if text.lower().startswith(commands[0]) and not Scratch.START_SPEECH_RECOGNITION:
+                            Scratch.START_SPEECH_RECOGNITION = True
+                        elif text.lower().startswith(commands[1]):
+                            Scratch.START_SPEECH_RECOGNITION = False
+                        
+                        if Scratch.START_SPEECH_RECOGNITION and not text.lower().startswith(commands[0]):
+                            self.chat_window.get_prompt(text, 'audio')
             except Exception as e:
                 print(str(e))
                 continue
@@ -462,7 +466,7 @@ class Scratch(Tk):
             if item not in excluded and '!addmenu' not in item:
                 items.append(self.children[item].to_object())
 
-        db = shelve.open('scratch.db')
+        db = shelve.open(Scratch.DB_DIR)
         db['show_checklists'] = Scratch.SHOW_CHECKLISTS
         db['show_reminders'] = Scratch.SHOW_REMINDERS
         db['show_notes'] = Scratch.SHOW_NOTES
@@ -475,7 +479,7 @@ class Scratch(Tk):
         '''
         Load saved items
         '''
-        db = shelve.open('scratch.db')
+        db = shelve.open(Scratch.DB_DIR)
         items = []
         
         if 'items' in db.keys():
@@ -555,13 +559,13 @@ class Scratch(Tk):
         
         @return None
         '''
-        try:
-            items = self.children.copy()
-            
-            for item in items:
-                if item not in'!toolbar' and item not in '!addmenu':
-                    backup_item = self.children[item].to_object()
-                    
+        items = self.children.copy()
+        excluded = ['!toolbar', '!addmenu', '!chat']
+        for item in items:
+            if item not in excluded:
+                backup_item = self.children[item].to_object()
+                try:
+
                     if backup_item['type'] == 'reminder':
                         dt = backup_item['date_time']
                         backup_item['date_time'] = dt.strftime("%a %b %d %Y %H:%M:%S")
@@ -572,12 +576,11 @@ class Scratch(Tk):
                             self.children[item]._id = result['msg']
                     else:
                         updated = backup_item
-                        
                         del updated['_id']
                         result = Document.runnable_db.update(_filter={'id': backup_item['_id']}, update=updated)
-                        
-        except Exception:
-            pass
+                            
+                except Exception:
+                    pass
         
     def auto_backup(self, interval=18000):
         while True:
