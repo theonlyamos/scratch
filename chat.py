@@ -13,10 +13,11 @@ class Chat(Toplevel):
     Chat Window
     '''
 
-    def __init__(self, master=None, _id=None,  width=350,  **kw):
+    def __init__(self, master=None, _id=None,  width=350, ai_assistant=None,  **kw):
         super().__init__(master, **kw)
         self._id = _id
         self.width = width
+        self.ai_assistant = ai_assistant
         screen_width = master.winfo_screenwidth()
         width = (screen_width - (self.width*2))+90
         
@@ -196,7 +197,7 @@ class Chat(Toplevel):
         
     
     def query_chat(self, prompt: str, reply_type=None):
-        result = self.master.ai_assistant.chat(prompt, reply_type)
+        result = self.ai_assistant.chat(prompt, reply_type)
         ai_label = Label(
             self.chat_container,
             text=result,

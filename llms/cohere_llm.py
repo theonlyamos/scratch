@@ -54,20 +54,20 @@ class Coral(LLM):
     max_tokens: int = 1024
     """The maximum number of tokens to generate in the completion.""" 
     
-    client: Any
+    client: Any = Client(cohere_api_key)
 
     class Config:
         extra = Extra.forbid
     
-    @root_validator()
-    def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that the API key is set."""
-        api_key = get_from_dict_or_env(
-            values, "cohere_api_key", "COHERE_API_KEY"
-        )
-        values["cohere_api_key"] = api_key
-        values['client'] =  Client(api_key)
-        return values
+    # @model_validator(mode="strict")
+    # def validate_environment(cls, values: Dict) -> Dict:
+    #    """Validate that the API key is set."""
+    #    api_key = get_from_dict_or_env(
+    #        values, "cohere_api_key", "COHERE_API_KEY"
+    #    )
+    #    values["cohere_api_key"] = api_key
+    #    values['client'] =  Client(api_key)
+    #    return values
     
     @property
     def _llm_type(self) -> str:
@@ -91,7 +91,7 @@ class Coral(LLM):
             citation_quality='accurate',
             connectors=[{"id": "web-search"}]
         )
-        
+
         return response.text
 
 if __name__ == "__main__":

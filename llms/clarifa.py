@@ -1,7 +1,7 @@
 # Note: CLARIFAI_PAT must be set as env variable.
 from clarifai.client.model import Model
 from typing import Any, Dict
-from pydantic import Extra,  root_validator 
+from pydantic import Extra 
 from langchain.callbacks.manager import CallbackManagerForLLMRun
 from langchain.llms.base import LLM
 from langchain.utils import get_from_dict_or_env 
@@ -46,14 +46,14 @@ class ClarifaiClaudeV2(LLM):
     class Config:
         extra = Extra.forbid
     
-    @root_validator()
-    def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that the API key is set."""
-        personal_access_token = get_from_dict_or_env(
-            values, "clarifai_pat", "CLARIFAI_PAT"
-        )
-        values["clarifai_pat"] = personal_access_token
-        return values
+    # @model_validator(mode="strict")
+    # def validate_environment(cls, values: Dict) -> Dict:
+    #    """Validate that the API key is set."""
+    #    personal_access_token = get_from_dict_or_env(
+    #        values, "clarifai_pat", "CLARIFAI_PAT"
+    #    )
+    #    values["clarifai_pat"] = personal_access_token
+    #    return values
     
     @property
     def _llm_type(self) -> str:
@@ -89,14 +89,14 @@ class ClarifaiClaudeInstant(LLM):
     class Config:
         extra = Extra.forbid
     
-    @root_validator()
-    def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that the API key is set."""
-        personal_access_token = get_from_dict_or_env(
-            values, "clarifai_pat", "CLARIFAI_PAT"
-        )
-        values["clarifai_pat"] = personal_access_token
-        return values
+    # @model_validator(mode="strict")
+    # def validate_environment(cls, values: Dict) -> Dict:
+    #    """Validate that the API key is set."""
+    #    personal_access_token = get_from_dict_or_env(
+    #        values, "clarifai_pat", "CLARIFAI_PAT"
+    #    )
+    #    values["clarifai_pat"] = personal_access_token
+    #    return values
     
     @property
     def _llm_type(self) -> str:
@@ -132,14 +132,14 @@ class ClarifaiLlama2(LLM):
     class Config:
         extra = Extra.forbid
     
-    @root_validator()
-    def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that the API key is set."""
-        personal_access_token = get_from_dict_or_env(
-            values, "clarifai_pat", "CLARIFAI_PAT"
-        )
-        values["clarifai_pat"] = personal_access_token
-        return values
+    # @model_validator(mode="strict")
+    # def validate_environment(cls, values: Dict) -> Dict:
+    #    """Validate that the API key is set."""
+    #    personal_access_token = get_from_dict_or_env(
+    #        values, "clarifai_pat", "CLARIFAI_PAT"
+    #    )
+    #    values["clarifai_pat"] = personal_access_token
+    #    return values
     
     @property
     def _llm_type(self) -> str:

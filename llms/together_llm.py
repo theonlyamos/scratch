@@ -1,7 +1,7 @@
 import together 
 import logging
 from typing import Any, Dict, List, Mapping, Optional 
-from pydantic import Extra, Field, root_validator 
+from pydantic import Extra, Field, model_validator 
 from langchain.callbacks.manager import CallbackManagerForLLMRun
 from langchain.llms.base import LLM
 from langchain.llms.utils import enforce_stop_tokens
@@ -65,14 +65,14 @@ class TogetherLLM(LLM):
     class Config:
         extra = Extra.forbid
     
-    @root_validator()
-    def validate_environment(cls, values: Dict) -> Dict:
-        """Validate that the API key is set."""
-        api_key = get_from_dict_or_env(
-            values, "together_api_key", "TOGETHER_API_KEY"
-        )
-        values["together_api_key"] = api_key
-        return values
+    # @model_validator(mode="strict")
+    # def validate_environment(cls, values: Dict) -> Dict:
+    #    """Validate that the API key is set."""
+    #    api_key = get_from_dict_or_env(
+    #        values, "together_api_key", "TOGETHER_API_KEY"
+    #    )
+    #    values["together_api_key"] = api_key
+    #    return values
     
     @property
     def _llm_type(self) -> str:

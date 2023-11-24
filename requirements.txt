@@ -1,0 +1,15 @@
+setuptools
+python-dotenv
+pillow
+SpeechRecognition
+pyttsx3
+langhchain
+together
+cohere
+clarifai
+pyjokes
+pywhatkit
+runit-database
+google-search-results
+pyaudio
+spiral

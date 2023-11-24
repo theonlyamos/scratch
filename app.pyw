@@ -14,12 +14,14 @@ from checklist import CheckList
 from addmenu import AddMenu
 from reminder import Reminder
 from settings import Settings
-from ai import AIAssistant
+from ai import Assistant
 from chat import Chat
 
 from runit_database import Document
+from spiral.llms import Coral
 from datetime import datetime
 from time import sleep
+import logging
 import shelve
     
 from icons import icons
@@ -209,12 +211,15 @@ class Scratch(Tk):
         
         self.settings_window.withdraw()
         
-        self.chat_window = Chat(
-            self
-        )
-        self.chat_window.withdraw()
+        llm = Coral()
+        self.ai_assistant = Assistant(llm=llm)
         
-        self.ai_assistant = AIAssistant()
+        self.chat_window = Chat(
+            self,
+            ai_assistant=self.ai_assistant
+        )
+        
+        self.chat_window.withdraw()
         
         speech_thread = Thread(target=self.start_speech_recognition)
         speech_thread.daemon = True
@@ -347,8 +352,8 @@ class Scratch(Tk):
         while True:
             try:
                 if Scratch.SPEECH_RECOGNITION:
-                    text = get_audio()
-                    print(text)
+                    text: str = get_audio()
+                    logging.info(text)
                     if text:
                         if text.lower().startswith(commands[0]) and not Scratch.START_SPEECH_RECOGNITION:
                             Scratch.START_SPEECH_RECOGNITION = True
@@ -358,8 +363,8 @@ class Scratch(Tk):
                         if Scratch.START_SPEECH_RECOGNITION and not text.lower().startswith(commands[0]):
                             self.chat_window.get_prompt(text, 'audio')
             except Exception as e:
-                print(str(e))
-                continue
+                logging.warning(str(e))
+                pass
 
     def hover(self, event=None):
         '''
@@ -543,7 +548,7 @@ class Scratch(Tk):
             if 'reminder' in item_id or 'checklist' in item_id or 'note' in item_id:
                 if self.children[item].is_withdrawn:
                     self.children[item].withdraw()
-                    self.children[item].is_withdrawn = True
+                    self.children[item].is_withdrawn = True # type: ignore
 
     def reload(self):
         '''
@@ -563,7 +568,7 @@ class Scratch(Tk):
         excluded = ['!toolbar', '!addmenu', '!chat']
         for item in items:
             if item not in excluded:
-                backup_item = self.children[item].to_object()
+                backup_item = self.children[item].to_object() # type: ignore
                 try:
 
                     if backup_item['type'] == 'reminder':
@@ -573,7 +578,7 @@ class Scratch(Tk):
                     if backup_item['_id'] is None:
                         result = Document.runnable_db.insert_one(document=backup_item)
                         if (result['status'] == 'success'):
-                            self.children[item]._id = result['msg']
+                            self.children[item]._id = result['msg'] # type: ignore
                     else:
                         updated = backup_item
                         del updated['_id']

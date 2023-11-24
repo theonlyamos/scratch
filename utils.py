@@ -3,14 +3,14 @@ import pyttsx3
 
 speech_engine = pyttsx3.init()
 
-def get_audio():
+def get_audio() -> str:
     recorder = sr.Recognizer()
     with sr.Microphone() as source:
         # print("Listening.....")
         audio = recorder.listen(source)
 
     # print('Recognizing text...')
-    text = recorder.recognize_google(audio)
+    text: str = recorder.recognize_google(audio)
     # print('You said:'+text)
     return text
 
