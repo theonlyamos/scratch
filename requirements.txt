@@ -3,7 +3,7 @@ python-dotenv
 pillow
 SpeechRecognition
 pyttsx3
-langhchain
+langchain
 together
 cohere
 clarifai
